@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<title>ÖTZI — Case Study / Project Title</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Space+Grotesk:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #000000;
+        color: #ffffff;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      main > :first-child {
+        margin-top: 0 !important;
+      }
+      main > :last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-lowest": "#000000",
+            "surface-container-low": "#090909",
+            "surface-container": "#111111",
+            "surface-container-high": "#181818",
+            "surface-container-highest": "#262626",
+            "surface": "#000000",
+            "background": "#000000",
+            "on-surface": "#ffffff",
+            "on-background": "#ffffff",
+            "secondary": "#a3a3a3",
+            "on-surface-variant": "#a3a3a3",
+            "primary": "#ff2d95",
+            "primary-container": "#ff2d95",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#ffffff",
+            "outline": "#6b6b6b",
+            "outline-variant": "#262626",
+            "surface-bright": "#393939"
+          },
+          borderRadius: {
+            "DEFAULT": "0px",
+            "sm": "0px",
+            "md": "0px",
+            "lg": "0px",
+            "xl": "0px",
+            "full": "0px"
+          },
+          spacing: {
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2.5rem",
+            "space-2xl": "4rem",
+            "space-3xl": "6rem"
+          },
+          fontFamily: {
+            "headline-lg": ["Space Grotesk", "sans-serif"],
+            "headline-md": ["Space Grotesk", "sans-serif"],
+            "headline-md-mobile": ["Space Grotesk", "sans-serif"],
+            "display-xl": ["Space Grotesk", "sans-serif"],
+            "title-sm": ["Hanken Grotesk", "sans-serif"],
+            "body-lg": ["Hanken Grotesk", "sans-serif"],
+            "body-md": ["Hanken Grotesk", "sans-serif"],
+            "body-sm": ["Hanken Grotesk", "sans-serif"],
+            "label-action": ["Hanken Grotesk", "sans-serif"],
+            "label-mono": ["Hanken Grotesk", "sans-serif"]
+          },
+          fontSize: {
+            "display-xl": ["88px", { lineHeight: "84px", letterSpacing: "-0.04em", fontWeight: "800" }],
+            "headline-lg": ["56px", { lineHeight: "58px", letterSpacing: "-0.03em", fontWeight: "800" }],
+            "headline-md": ["36px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "title-sm": ["20px", { lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", letterSpacing: "0em", fontWeight: "400" }],
+            "body-md": ["15px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }],
+            "body-sm": ["13px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "label-action": ["14px", { lineHeight: "16px", letterSpacing: "0.06em", fontWeight: "700" }],
+            "label-mono": ["11px", { lineHeight: "14px", letterSpacing: "0.12em", fontWeight: "700" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#000000] font-body-md text-body-md text-on-surface antialiased selection:bg-primary selection:text-white">
+<!-- 1. TOP NAVIGATION -->
+<header class="fixed top-0 left-0 w-full z-50 bg-[#000000] border-b border-[#262626]">
+<div class="h-[72px] max-w-[1680px] mx-auto px-margin lg:px-margin-desktop flex items-center justify-between">
+<div class="flex items-center">
+<a class="font-headline-md text-headline-md tracking-tighter uppercase text-white hover:text-primary transition-colors select-none" data-path="work" href="#">
+          ÖTZI
+        </a>
+</div>
+<nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-on-surface border-b-2 border-primary-container pb-1">
+<a class="font-label-action text-label-action uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors" data-path="work" href="#">
+          WORK
+        </a>
+<a aria-current="page" class="font-label-action text-label-action uppercase tracking-widest text-white border-b-2 border-primary pb-1 transition-colors" data-path="case-studies" href="#">
+          CASE STUDIES
+        </a>
+<a class="font-label-action text-label-action uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors" data-path="services" href="#">
+          SERVICES
+        </a>
+<a class="font-label-action text-label-action uppercase tracking-widest text-[#a3a3a3] hover:text-white transition-colors" data-path="about" href="#">
+          ABOUT
+        </a>
+</nav>
+<div class="flex items-center gap-space-md">
+<a class="inline-flex items-center justify-center bg-primary text-white px-space-lg py-space-sm font-label-action text-label-action uppercase tracking-wider hover:bg-white hover:text-black transition-colors rounded-none font-bold" data-path="contact" href="#">
+          START A PROJECT →
+        </a>
+</div>
+</div>
+</header>
+<main class="w-full pt-[72px] bg-[#000000] min-h-screen">
+<div class="flex flex-col w-full">
+<!-- 2. BREADCRUMB & INTRO HEADER -->
+<section class="w-full bg-[#000000] border-b border-[#262626]">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop pt-space-xl lg:pt-space-2xl pb-space-xl">
+<div class="flex flex-col gap-space-lg">
+<!-- Minimal breadcrumb -->
+<div class="flex items-center gap-space-sm font-label-mono text-label-mono uppercase tracking-widest text-[#a3a3a3]">
+<a class="hover:text-white transition-colors" href="#">CASE STUDIES</a>
+<span>/</span>
+<span class="text-white">PROJECT TITLE</span>
+<span>/</span>
+<span>2026</span>
+</div>
+<!-- Monumental Project Title -->
+<h1 class="font-display-xl text-headline-lg md:text-display-xl uppercase tracking-tighter text-white leading-none select-none m-0">
+              PROJECT TITLE
+            </h1>
+<!-- Synopsis + Specs Split Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop pt-space-lg border-t border-[#262626] items-start">
+<div class="lg:col-span-7">
+<p class="font-body-lg text-body-lg text-[#a3a3a3] leading-relaxed max-w-2xl m-0">
+                  Comprehensive brand repositioning and social ecosystem architecture engineered for cultural velocity and cross-platform narrative coherence.
+                </p>
+</div>
+<div class="lg:col-span-5 grid grid-cols-2 gap-x-space-lg gap-y-space-md font-label-mono text-label-mono uppercase">
+<div class="space-y-1">
+<span class="text-[#a3a3a3] block">CLIENT</span>
+<span class="text-white tracking-wider block">CLIENT NAME</span>
+</div>
+<div class="space-y-1">
+<span class="text-[#a3a3a3] block">YEAR</span>
+<span class="text-white tracking-wider block">2026</span>
+</div>
+<div class="space-y-1">
+<span class="text-[#a3a3a3] block">SERVICES</span>
+<span class="text-white tracking-wider block">SOCIAL MEDIA STRATEGY, CONTENT, CREATIVE, DIGITAL</span>
+</div>
+<div class="space-y-1">
+<span class="text-[#a3a3a3] block">PLATFORMS</span>
+<span class="text-white tracking-wider block">INSTAGRAM, TIKTOK</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. HERO MEDIA (16:9 Cinematic Container) -->
+<section class="w-full bg-[#000000] border-b border-[#262626]">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop py-space-xl">
+<div class="relative w-full aspect-video bg-[#090909] overflow-hidden group border border-[#262626]">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-700 group-hover:scale-[1.01]" data-alt="Monochromatic avant-garde fashion campaign editorial film still, sharp high-contrast lighting, brutalist concrete runway backdrop with a lone silhouette model wearing architectural tailored outerwear, fine cinematic grain, dark pitch black tones, stark brutalist high fashion aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgJLSEJsXBi00qIuHVOAnIwf5ByY_1BcATwqOIejPT0055IOzgtZvL5If_spVLvQ1w_Nh4vNEaKs1aGQtaE_xAyBHB0Td0F4XUQ6m4Ym6Y7c98mgeIUwRFZbFOdAyuFvP4zv3gILgIUhVyEAaDvZK03dKm-qpOEJKpjf51FX2-nwqUnDTE3wiCAFE1U5BtgAFbvMQN2rs46Y9SFYQOu-pTmop4cFFSWPq0ROqgD8Eu5vNdUOSMFp9HxA"/>
+<!-- Center Play Trigger -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="bg-[#000000]/90 border border-[#262626] px-space-lg py-space-sm flex items-center gap-space-sm text-white font-label-action text-label-action uppercase tracking-widest group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+<span>PLAY CAMPAIGN FILM</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. CASE STUDY NARRATIVE (01 to 04) -->
+<!-- 01 — CHALLENGE -->
+<section class="w-full bg-[#000000] border-b border-[#262626] py-space-3xl">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<div class="lg:col-span-4">
+<h2 class="font-headline-md text-headline-md-mobile md:text-headline-md uppercase text-white tracking-tight m-0 font-bold">
+              01 — CHALLENGE
+            </h2>
+</div>
+<div class="lg:col-span-8 space-y-space-md">
+<p class="font-body-lg text-body-lg text-white leading-relaxed m-0">
+              Transforming fragmented brand presence into a coherent social-first narrative architecture.
+            </p>
+<p class="font-body-md text-body-md text-[#a3a3a3] leading-relaxed m-0">
+              The legacy brand communication architecture suffered from high-volume friction, platform saturation, and an absence of distinct narrative authority across key dynamic feeds. Rapid algorithm shifts diluted retention and fragmented consumer affinity. The assignment required engineering an uncompromising visual point of view capable of piercing through feed monotony, reasserting absolute premium brand posture, and constructing a sustainable high-velocity social framework without artistic compromise.
+            </p>
+</div>
+</div>
+</section>
+<!-- 02 — STRATEGY -->
+<section class="w-full bg-[#000000] border-b border-[#262626] py-space-3xl">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<div class="lg:col-span-4">
+<h2 class="font-headline-md text-headline-md-mobile md:text-headline-md uppercase text-white tracking-tight m-0 font-bold">
+              02 — STRATEGY
+            </h2>
+</div>
+<div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-12 gap-gutter-desktop items-start">
+<div class="md:col-span-7 space-y-space-md">
+<p class="font-body-lg text-body-lg text-white leading-relaxed m-0">
+                A disciplined four-pillar content framework calibrated for algorithmic retention and cultural authority.
+              </p>
+<div class="space-y-space-md border-t border-[#262626] pt-space-md">
+<div class="pb-space-sm border-b border-[#262626]">
+<span class="font-label-mono text-label-mono text-white uppercase block mb-1 font-bold">PHASE I // CADENCE</span>
+<p class="font-body-md text-body-md text-[#a3a3a3] m-0">High-density algorithmic calibration prioritizing 3-second hook conversion and ruthless pacing across 9:16 vertical real estate.</p>
+</div>
+<div class="pb-space-sm border-b border-[#262626]">
+<span class="font-label-mono text-label-mono text-white uppercase block mb-1 font-bold">PHASE II // MONOGRAPH</span>
+<p class="font-body-md text-body-md text-[#a3a3a3] m-0">Editorial 4:5 carousels designed as tactile publications inside the feed, driving prolonged dwell time and save metrics.</p>
+</div>
+<div class="pb-space-sm">
+<span class="font-label-mono text-label-mono text-white uppercase block mb-1 font-bold">PHASE III // CINEMA</span>
+<p class="font-body-md text-body-md text-[#a3a3a3] m-0">Anamorphic long-form documentary cuts exploring craft, materials, and cultural friction for community retention.</p>
+</div>
+</div>
+</div>
+<!-- Supporting Media: Strategy Visualization (4:5) -->
+<div class="md:col-span-5">
+<div class="relative w-full aspect-[4/5] bg-[#090909] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-150" data-alt="Editorial mood and conceptual design layout, typographic collage with geometric grid rules, high contrast fashion typography and texture studies in pitch black and stark white." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKKcQBGTRWHi4FqB1h1v-k0Fhe12FVCSyyzbLt4Hw65e_7ecgRHKJgnBT9FZiMW0INIMe0XEnDEif5jnfkJoWIdFb9a_F-d_jIaoHeQrNuJTcflFLEZ406bEgtnTgasUbwdd1M2WsC3unFI_yRNMIoG0hUtJUcKeoApkNn25W2y4V-gJcH-nS98TlIidc7Wqkwlxtjvgnc9mTCG1MVzDb9DFh_Jg62Y4fDlRAJDD3n_aPiIIm47HuX7w"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 03 — EXECUTION -->
+<section class="w-full bg-[#000000] border-b border-[#262626] py-space-3xl">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop flex flex-col gap-space-2xl">
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b border-[#262626] pb-space-lg gap-space-md">
+<div>
+<h2 class="font-headline-md text-headline-md-mobile md:text-headline-md uppercase text-white tracking-tight m-0 font-bold">
+                03 — EXECUTION
+              </h2>
+</div>
+<p class="font-label-mono text-label-mono uppercase tracking-widest text-[#a3a3a3] m-0">
+              MULTI-FORMAT CONTENT ARCHITECTURE
+            </p>
+</div>
+<!-- Asymmetric Editorial Grid Stacked Cleanly for Mobile -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<!-- 9:16 Vertical Reel Frame (Col 1-5) -->
+<div class="lg:col-span-5 flex flex-col group cursor-pointer">
+<div class="relative w-full max-w-[420px] aspect-[9/16] bg-[#090909] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="Vertical full body high fashion portrait, dynamic street movement in brutalist Berlin architectural backdrop, dramatic low angle lighting, model wearing monochrome textured oversized cloak, minimal sharp composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV5sCNAElEwsmr4VqbHF2t2czpEz2WA7a-dVFfaKLqPGrNhKgeiGYRfbmdtSVJX30m4br6jlS3dVdRxFmcb1_SrEw0NEyQgzLBzQ9y1m3LME5kt3Wa85DXuEDy1RNTSLLYqWae4tqOvS2EC6LoYJuN6OIgoyDUNB5cAB6cSb44VIgyAS9Z9usOo7iuGEtrhfR0oO5d0n0FrL4kORitoOxImhilv2vF7aF9J6DgllduHv1b459ODImqHQ"/>
+<!-- Top subtle bar -->
+<div class="absolute top-0 left-0 w-full p-4 flex items-center justify-between pointer-events-none">
+<div class="font-label-mono text-label-mono text-white bg-[#000000]/80 px-2 py-1 tracking-widest uppercase border border-[#262626]">
+                  9:16
+                </div>
+<div class="font-label-mono text-label-mono text-white tracking-widest uppercase">
+                  ÖTZI
+                </div>
+</div>
+<!-- Play Trigger -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="bg-[#000000]/90 border border-[#262626] px-4 py-2 flex items-center gap-2 text-white font-label-action text-label-action tracking-widest uppercase group-hover:bg-primary group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">play_arrow</span>
+<span>PLAY REEL</span>
+</div>
+</div>
+<!-- Mobile UI subtle indicator -->
+<div class="absolute bottom-4 left-0 w-full px-4 flex justify-between items-center text-white/70">
+<span class="material-symbols-outlined text-[18px]">home</span>
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span class="material-symbols-outlined text-[18px]">add_box</span>
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="material-symbols-outlined text-[18px]">account_circle</span>
+</div>
+</div>
+<div class="pt-space-md border-t border-[#262626] mt-space-md max-w-[420px]">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT: CLIENT NAME</span>
+<span>YEAR: 2026</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors mt-1 mb-0">
+                  PROJECT TITLE
+                </h3>
+<div class="flex items-center justify-between pt-space-xs text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>TYPE: REEL</span>
+<span>PLATFORM: INSTAGRAM</span>
+</div>
+</div>
+</div>
+<!-- Right Cluster (Col 6-12) -->
+<div class="lg:col-span-7 flex flex-col gap-space-2xl">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-gutter-desktop">
+<!-- 4:5 Carousel Frame -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[4/5] bg-[#090909] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="Editorial monograph carousel slide layout, fine textured typography close-up mixed with extreme macro fabric weave, intense black and white studio lighting, minimal art direction." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_8U6F8zJkrRxa9akJS2w0H8gla9QiEc1_8ovs7bYZbk7j8MSP9KjVi3-IFqzxsb8Q6ECLwn1Xuwek7Sm4nAzvFQpXF43am0B5ZKV29553r_j72CS82TG5bMfR87WfWMDT2ufhXtDda0C0cczU85tT0tarYx-0glcWWAfklHInkQZg2HwDtcW-Eba_sv08YaEt0K0R5hDMEoE6Kkq0FZhfA1rZoK-TVkYbQvoi_MdDElxrPGy1SaXqZQ"/>
+<div class="absolute top-4 right-4 bg-[#000000] text-primary font-label-mono text-label-mono px-2 py-1 tracking-widest font-bold border border-[#262626]">1/6</div>
+<div class="absolute top-4 left-4 bg-[#000000]/80 text-white font-label-mono text-label-mono px-2 py-1 tracking-widest uppercase border border-[#262626]">
+                      4:5
+                    </div>
+</div>
+<div class="pt-space-md border-t border-[#262626] mt-space-md">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT: CLIENT NAME</span>
+<span>YEAR: 2026</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors mt-1 mb-0">
+                      PROJECT TITLE
+                    </h3>
+<div class="flex items-center justify-between pt-space-xs text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>TYPE: CAROUSEL</span>
+<span>PLATFORM: INSTAGRAM</span>
+</div>
+</div>
+</div>
+<!-- 1:1 Square Frame -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-square bg-[#090909] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-150 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="High contrast geometric detail shot, typography debossed on cold industrial aluminum block, studio spotlight with harsh shadows and sharp brutalist lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtLNeG-Q9sWqZY9e6wXdusIGGa0TAzVXlpsrWsl18mYf5ajSmDB0BhAcmDas8WlYVW8dM5nthJke30Er7LbMmgadfxvGZdMZpIQXWJhBH7gpedBXwJN3drVRHFYCnxvrzPf9h1wXifae-5Vp3vokLRZLLI5NOxlPzW-EtyYCPQgEqm7se9V2KL3HgofP5FQm-qbwYoKMedV7YfU2H-OL1Pex-egWhDLwsOusjs-raqAPiW9nwoahRLZA"/>
+<div class="absolute top-4 left-4 bg-[#000000]/80 text-white font-label-mono text-label-mono px-2 py-1 tracking-widest uppercase border border-[#262626]">
+                      1:1
+                    </div>
+</div>
+<div class="pt-space-md border-t border-[#262626] mt-space-md">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT: CLIENT NAME</span>
+<span>YEAR: 2026</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors mt-1 mb-0">
+                      PROJECT TITLE
+                    </h3>
+<div class="flex items-center justify-between pt-space-xs text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>TYPE: POST</span>
+<span>PLATFORM: TIKTOK</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 16:9 Wide Cut Frame -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-video bg-[#090909] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="Cinematic widescreen film still of a sleek minimal concept vehicle moving through an empty brutalist concrete parking structure at dusk, sodium vapor harsh rim light, deep pitch black shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbqxC2JBZ1OMojy1j0ZIvaKErI05ZctCZ-FhbjR9TO_xorUdcEVbiLeIA_K_KF6RrLA4APSQ9JXtOcA3-O4JMPltROD5GDbJDBrDeVTUW3TeX5jzRbiTYsE-gAFr081lqOGyL_LjPq5knqYDoHq3A9QDLoHjPN_m0jhlUrqW_c-7Wk2W9NxlifR7uv3e0dje0Z4S6zYhM3n3WVqxjp0QUGlxRSEpkBpKTLAfYw92qpyAzN7i5AGUMutg"/>
+<div class="absolute top-4 left-4 bg-[#000000]/80 text-white font-label-mono text-label-mono px-2 py-1 tracking-widest uppercase border border-[#262626]">
+                    16:9
+                  </div>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="bg-[#000000]/90 border border-[#262626] px-4 py-2 flex items-center gap-2 text-white font-label-action text-label-action tracking-widest uppercase group-hover:bg-primary group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">play_arrow</span>
+<span>PLAY SHORT FILM</span>
+</div>
+</div>
+</div>
+<div class="pt-space-md border-t border-[#262626] mt-space-md">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT: CLIENT NAME</span>
+<span>YEAR: 2026</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors mt-1 mb-0">
+                    PROJECT TITLE
+                  </h3>
+<div class="flex items-center justify-between pt-space-xs text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>TYPE: SHORT / CAMPAIGN</span>
+<span>PLATFORM: YOUTUBE / DIGITAL</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 04 — RESULTS -->
+<section class="w-full bg-[#000000] border-b border-[#262626] py-space-3xl">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop space-y-space-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md border-b border-[#262626] pb-space-lg">
+<div>
+<h2 class="font-headline-md text-headline-md-mobile md:text-headline-md uppercase text-white tracking-tight m-0 font-bold">
+                04 — RESULTS
+              </h2>
+</div>
+<p class="font-body-md text-body-md text-[#a3a3a3] m-0">
+              Performance attribution and algorithmic retention metrics following cross-channel rollout.
+            </p>
+</div>
+<!-- Restrained Proof Point Metrics Matrix (Clean 2x2 grid with dashes, no fake numbers) -->
+<div class="grid grid-cols-2 md:grid-cols-4 border border-[#262626] bg-[#090909]">
+<div class="p-space-lg border-r border-b md:border-b-0 border-[#262626] space-y-space-xs">
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest block">REACH</span>
+<div class="font-display-xl text-headline-lg md:text-display-xl text-white font-extrabold leading-none select-none">—</div>
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase block">CROSS-PLATFORM</span>
+</div>
+<div class="p-space-lg border-b md:border-b-0 md:border-r border-[#262626] space-y-space-xs">
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest block">ENGAGEMENT</span>
+<div class="font-display-xl text-headline-lg md:text-display-xl text-white font-extrabold leading-none select-none">—</div>
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase block">BENCHMARK RATIO</span>
+</div>
+<div class="p-space-lg border-r border-[#262626] space-y-space-xs">
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest block">VIEWS</span>
+<div class="font-display-xl text-headline-lg md:text-display-xl text-white font-extrabold leading-none select-none">—</div>
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase block">AGGREGATE RUN</span>
+</div>
+<div class="p-space-lg space-y-space-xs">
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest block">CONVERSIONS</span>
+<div class="font-display-xl text-headline-lg md:text-display-xl text-white font-extrabold leading-none select-none">—</div>
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase block">DIRECT ATTRIBUTION</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs font-label-mono text-label-mono uppercase text-[#a3a3a3]">
+<span class="w-2 h-2 bg-[#a3a3a3] inline-block"></span>
+<span>ATTRIBUTION METRICS SYNCED UPON CAMPAIGN CONCLUSION.</span>
+</div>
+</div>
+</section>
+<!-- 5. CONTENT FROM THIS PROJECT -->
+<section class="w-full bg-[#000000] border-b border-[#262626] py-space-3xl">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop space-y-space-xl">
+<div class="flex items-center justify-between border-b border-[#262626] pb-space-md">
+<h3 class="font-headline-md text-headline-md uppercase text-white tracking-tighter m-0 font-bold">
+              CONTENT FROM THIS PROJECT
+            </h3>
+<span class="font-label-mono text-label-mono uppercase text-[#a3a3a3] tracking-widest">[03 PIECES]</span>
+</div>
+<!-- 3 Related Work Tiles using exact Work screen language -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-desktop items-start">
+<!-- Tile 1: Vertical Reel Asset -->
+<div class="flex flex-col group cursor-pointer border border-[#262626] p-space-md bg-[#090909]">
+<div class="relative w-full aspect-[9/16] bg-[#000000] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="Vertical fashion portrait in brutalist environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV5sCNAElEwsmr4VqbHF2t2czpEz2WA7a-dVFfaKLqPGrNhKgeiGYRfbmdtSVJX30m4br6jlS3dVdRxFmcb1_SrEw0NEyQgzLBzQ9y1m3LME5kt3Wa85DXuEDy1RNTSLLYqWae4tqOvS2EC6LoYJuN6OIgoyDUNB5cAB6cSb44VIgyAS9Z9usOo7iuGEtrhfR0oO5d0n0FrL4kORitoOxImhilv2vF7aF9J6DgllduHv1b459ODImqHQ"/>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="bg-[#000000]/90 border border-[#262626] px-3 py-1.5 flex items-center gap-1.5 text-white font-label-action text-label-action tracking-widest uppercase group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[14px]">play_arrow</span>
+<span>PLAY</span>
+</div>
+</div>
+</div>
+<div class="pt-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT NAME</span>
+<span>REEL</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors m-0">
+                CAMPAIGN REEL 01
+              </h4>
+<a class="font-label-action text-label-action text-primary uppercase tracking-widest pt-space-xs inline-flex items-center gap-1 hover:text-white transition-colors" href="#">
+                EXPLORE ASSET →
+              </a>
+</div>
+</div>
+<!-- Tile 2: 4:5 Carousel Asset -->
+<div class="flex flex-col group cursor-pointer border border-[#262626] p-space-md bg-[#090909]">
+<div class="relative w-full aspect-[4/5] bg-[#000000] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="Monograph carousel detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_8U6F8zJkrRxa9akJS2w0H8gla9QiEc1_8ovs7bYZbk7j8MSP9KjVi3-IFqzxsb8Q6ECLwn1Xuwek7Sm4nAzvFQpXF43am0B5ZKV29553r_j72CS82TG5bMfR87WfWMDT2ufhXtDda0C0cczU85tT0tarYx-0glcWWAfklHInkQZg2HwDtcW-Eba_sv08YaEt0K0R5hDMEoE6Kkq0FZhfA1rZoK-TVkYbQvoi_MdDElxrPGy1SaXqZQ"/>
+<div class="absolute top-2 right-2 bg-[#000000] text-primary font-label-mono text-label-mono px-1.5 py-0.5 tracking-widest font-bold border border-[#262626]">1/6</div>
+</div>
+<div class="pt-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT NAME</span>
+<span>CAROUSEL</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors m-0">
+                EDITORIAL CAROUSEL 02
+              </h4>
+<a class="font-label-action text-label-action text-primary uppercase tracking-widest pt-space-xs inline-flex items-center gap-1 hover:text-white transition-colors" href="#">
+                VIEW CAROUSEL →
+              </a>
+</div>
+</div>
+<!-- Tile 3: 16:9 Short Film Asset -->
+<div class="flex flex-col group cursor-pointer border border-[#262626] p-space-md bg-[#090909]">
+<div class="relative w-full aspect-video bg-[#000000] border border-[#262626] overflow-hidden">
+<img class="w-full h-full object-cover grayscale contrast-125 transition-transform duration-500 group-hover:scale-[1.02]" data-alt="Cinematic film cut still" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbqxC2JBZ1OMojy1j0ZIvaKErI05ZctCZ-FhbjR9TO_xorUdcEVbiLeIA_K_KF6RrLA4APSQ9JXtOcA3-O4JMPltROD5GDbJDBrDeVTUW3TeX5jzRbiTYsE-gAFr081lqOGyL_LjPq5knqYDoHq3A9QDLoHjPN_m0jhlUrqW_c-7Wk2W9NxlifR7uv3e0dje0Z4S6zYhM3n3WVqxjp0QUGlxRSEpkBpKTLAfYw92qpyAzN7i5AGUMutg"/>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="bg-[#000000]/90 border border-[#262626] px-3 py-1.5 flex items-center gap-1.5 text-white font-label-action text-label-action tracking-widest uppercase group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[14px]">play_arrow</span>
+<span>PLAY</span>
+</div>
+</div>
+</div>
+<div class="pt-space-md flex flex-col gap-1">
+<div class="flex items-center justify-between text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest">
+<span>CLIENT NAME</span>
+<span>SHORT FILM</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-white uppercase tracking-tight group-hover:text-primary transition-colors m-0">
+                NARRATIVE CUT 03
+              </h4>
+<a class="font-label-action text-label-action text-primary uppercase tracking-widest pt-space-xs inline-flex items-center gap-1 hover:text-white transition-colors" href="#">
+                WATCH FILM →
+              </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. NEXT PROJECT & NAVIGATION -->
+<section class="w-full bg-[#000000] border-b border-[#262626]">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop py-space-xl">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-desktop items-center border border-[#262626] p-space-lg bg-[#090909]">
+<div class="flex flex-col gap-space-sm border-b md:border-b-0 md:border-r border-[#262626] pb-space-md md:pb-0 md:pr-space-lg col-span-1 md:col-span-2">
+<span class="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">NEXT PROJECT →</span>
+<a class="font-headline-md text-headline-md-mobile md:text-headline-md uppercase text-white hover:text-primary tracking-tight transition-colors select-none font-bold" href="#">
+    PROJECT TITLE
+  </a>
+</div>
+<div class="flex flex-col sm:flex-row md:flex-col justify-between gap-space-sm pt-space-md md:pt-0 font-label-action text-label-action uppercase tracking-wider">
+<a class="group inline-flex items-center gap-space-xs text-[#a3a3a3] hover:text-white transition-colors" href="#">
+<span class="transition-transform group-hover:-translate-x-1">←</span>
+<span>PREVIOUS PROJECT</span>
+</a>
+<a class="inline-flex items-center text-white border-b border-primary pb-0.5 w-fit hover:text-primary transition-colors tracking-widest" href="#">
+    INDEX / ALL WORK
+  </a>
+<a class="group inline-flex items-center gap-space-xs text-[#a3a3a3] hover:text-white transition-colors" href="#">
+<span>NEXT PROJECT</span>
+<span class="transition-transform group-hover:translate-x-1">→</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. START A PROJECT & OVERSIZED FOOTER -->
+<!-- Direct Engagement CTA Section -->
+<section class="w-full bg-[#000000] py-space-3xl overflow-hidden">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-end">
+<div class="lg:col-span-8 flex flex-col gap-space-md">
+<div class="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
+<span class="w-2 h-2 bg-primary"></span>
+                NEW ENGAGEMENTS
+              </div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
+                START A PROJECT.
+              </h2>
+<!-- Signature Runway Hairline Arrow -->
+<div class="w-full relative my-space-md flex items-center">
+<div class="w-full h-[1px] bg-[#262626]"></div>
+<div class="w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[10px] border-l-[#262626] shrink-0 -ml-[1px]"></div>
+</div>
+<p class="font-body-lg text-body-lg text-[#a3a3a3] max-w-2xl m-0 leading-relaxed">
+                Open for selective brand commissions, social ecosystem design, dynamic motion infrastructure, and creative direction for high-conviction teams.
+              </p>
+</div>
+<div class="lg:col-span-4 flex flex-col items-start lg:items-end justify-end mt-space-lg lg:mt-0">
+<a class="inline-flex items-center justify-center bg-primary text-white px-space-xl py-space-md font-label-action text-label-action uppercase tracking-widest hover:bg-white hover:text-black transition-colors rounded-none w-full sm:w-auto font-bold" data-path="contact" href="#">
+                INITIATE DIALOGUE →
+              </a>
+<span class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest mt-space-sm">
+                CURRENT RESPONSE WINDOW: &lt; 24H
+              </span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Full ÖTZI Footer -->
+<footer class="w-full bg-[#000000] border-t border-[#262626] overflow-hidden">
+<div class="max-w-[1680px] mx-auto px-margin lg:px-margin-desktop pt-space-2xl pb-space-lg">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter-desktop border-b border-[#262626] pb-space-xl mb-space-xl">
+<div class="md:col-span-4 flex flex-col justify-between">
+<div class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest mb-space-sm font-bold">INQUIRIES</div>
+<a class="font-headline-md-mobile text-headline-md-mobile md:font-headline-md md:text-headline-md uppercase text-white hover:text-primary transition-colors font-bold" href="mailto:hello@otzi.studio">
+            HELLO@OTZI.STUDIO
+          </a>
+</div>
+<div class="md:col-span-4 flex flex-col justify-between">
+<div class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest mb-space-sm font-bold">NETWORKS</div>
+<div class="flex flex-col gap-space-xs font-label-action text-label-action uppercase">
+<a class="text-[#a3a3a3] hover:text-primary transition-colors" href="#">INSTAGRAM →</a>
+<a class="text-[#a3a3a3] hover:text-primary transition-colors" href="#">ARE.NA →</a>
+<a class="text-[#a3a3a3] hover:text-primary transition-colors" href="#">LINKEDIN →</a>
+</div>
+</div>
+<div class="md:col-span-4 flex flex-col justify-between items-start md:items-end">
+<a class="inline-flex items-center gap-space-xs font-label-action text-label-action uppercase text-white hover:text-primary border border-[#262626] px-space-md py-space-sm transition-colors rounded-none" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+            BACK TO TOP ↑
+          </a>
+<div class="font-label-mono text-label-mono text-[#a3a3a3] uppercase tracking-widest mt-space-md md:mt-0">
+            PARIS / BERLIN / NEW YORK
+          </div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center pt-space-sm text-[#a3a3a3] font-label-mono text-label-mono uppercase tracking-widest gap-space-sm">
+<div>© 2026 ÖTZI CREATIVE &amp; SOCIAL PRODUCTION. ALL RIGHTS RESERVED.</div>
+<div>CREATIVE DIRECTION &amp; PRODUCTION</div>
+</div>
+</div>
+<!-- Signature Massive Cropped Bleed Wordmark -->
+<div class="w-full select-none pointer-events-none overflow-hidden leading-none">
+<div class="font-display-xl text-[18vw] leading-[0.78] font-extrabold uppercase tracking-tighter text-[#1f1f1f] text-center translate-y-[15%]">
+        ÖTZI
+      </div>
+</div>
+</footer>
+</body></html>

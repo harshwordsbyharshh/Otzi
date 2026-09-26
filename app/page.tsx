@@ -1,69 +1,252 @@
-import Image from "next/image";
+import React from "react";
+import { Button } from "@/components/ui/Button";
+import { HairlineDivider } from "@/components/ui/HairlineDivider";
+import { ArrowLink } from "@/components/ui/ArrowLink";
+import { ProjectCard } from "@/components/portfolio/ProjectCard";
+import { disciplinesData, selectedProjectsData } from "@/lib/data/homepage";
 
-export default function Home() {
+export default function HomePage() {
+  const reelProject = selectedProjectsData.find((p) => p.aspectRatio === "9:16") || selectedProjectsData[0];
+  const carouselProject = selectedProjectsData.find((p) => p.aspectRatio === "4:5") || selectedProjectsData[1];
+  const squareProject = selectedProjectsData.find((p) => p.aspectRatio === "1:1") || selectedProjectsData[2];
+  const cinemaProject = selectedProjectsData.find((p) => p.aspectRatio === "16:9") || selectedProjectsData[3];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col w-full bg-black min-h-screen">
+      {/* ====================================================================
+          1. HERO SECTION
+          ==================================================================== */}
+      <section className="w-full bg-black border-b border-[#262626]" aria-label="Agency Overview">
+        <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 pt-16 md:pt-24 lg:pt-32 pb-16 md:pb-24">
+          <div className="flex flex-col gap-6 md:gap-8">
+            {/* Header Accent Motif */}
+            <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
+              <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
+              <span>ÖTZI</span>
+            </div>
+
+            {/* Monumental Editorial Headline */}
+            <h1 className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none">
+              SOCIAL MEDIA MANAGEMENT
+              <br />
+              &amp; CREATIVE PRODUCTION.
+            </h1>
+
+            {/* Asymmetric Split Grid: Description & Capabilities */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 md:pt-12 border-t border-[#262626] items-start">
+              <div className="lg:col-span-7 space-y-6">
+                <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
+                  ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-4">
+                  <Button variant="accent" href="/contact">
+                    START A PROJECT
+                  </Button>
+                  <Button variant="secondary" href="/work">
+                    EXPLORE WORK
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right Specifications & Discipline Tags */}
+              <div className="lg:col-span-5 flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
+                <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold">
+                  CORE DISCIPLINES
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {disciplinesData.map((d) => (
+                    <span
+                      key={d.id}
+                      className="border border-[#262626] px-3 py-1.5 font-label-mono text-label-mono uppercase text-paper-dim tracking-widest bg-surface-container-low"
+                    >
+                      {d.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* ====================================================================
+          2. SELECTED WORK (ASYMMETRIC MULTI-FORMAT EDITORIAL GRID)
+          ==================================================================== */}
+      <section className="w-full bg-black border-b border-[#262626] py-16 md:py-24" aria-label="Selected Work">
+        <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 space-y-12">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#262626] pb-6 gap-4">
+            <div>
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold mb-2">
+                SELECTED WORK
+              </div>
+              <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
+                FEATURED PRODUCTIONS
+              </h2>
+            </div>
+            <ArrowLink href="/work" color="white">
+              VIEW ALL WORK
+            </ArrowLink>
+          </div>
+
+          {/* Asymmetric Stitch Layout: 9:16 Column + Right Media Cluster */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* 9:16 Vertical Reel Frame (Col 1-5) */}
+            <div className="lg:col-span-5">
+              <ProjectCard project={reelProject} />
+            </div>
+
+            {/* Right Cluster (Col 6-12) */}
+            <div className="lg:col-span-7 flex flex-col gap-8">
+              {/* Row of 4:5 Carousel and 1:1 Square Frame */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <ProjectCard project={carouselProject} />
+                <ProjectCard project={squareProject} />
+              </div>
+
+              {/* 16:9 Widescreen Cut Frame */}
+              <ProjectCard project={cinemaProject} />
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* ====================================================================
+          3. CAPABILITIES / SERVICES (FIVE DISCIPLINES)
+          ==================================================================== */}
+      <section className="w-full bg-black border-b border-[#262626] py-16 md:py-24" aria-label="Capabilities">
+        <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 flex flex-col gap-12">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#262626] pb-6 gap-4">
+            <div>
+              <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary block mb-2 font-bold">
+                CORE DISCIPLINES
+              </span>
+              <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
+                SERVICES &amp; CAPABILITIES
+              </h2>
+            </div>
+          </div>
+
+          {/* 5-Discipline Editorial Split Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {disciplinesData.map((d) => (
+              <div
+                key={d.id}
+                className="border border-[#262626] p-6 bg-surface-container-low flex flex-col justify-between hover:border-paper-dim transition-colors group min-h-[260px]"
+              >
+                <div>
+                  <div className="font-label-mono text-label-mono text-primary uppercase tracking-widest font-bold mb-3">
+                    {d.number} {"//"}
+                  </div>
+                  <h3 className="font-title-sm text-title-sm uppercase text-white tracking-tight group-hover:text-primary transition-colors m-0 mb-3">
+                    {d.title}
+                  </h3>
+                  <p className="font-body-sm text-body-sm text-paper-dim m-0 leading-relaxed mb-6">
+                    {d.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-[#262626] space-y-1">
+                  {d.deliverables.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="font-label-mono text-[10px] text-paper-dim tracking-wider uppercase"
+                    >
+                      + {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          4. MANIFESTO / ABOUT MOMENT
+          ==================================================================== */}
+      <section className="w-full bg-black border-b border-[#262626] py-20 md:py-32" aria-label="Manifesto">
+        <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10">
+          <div className="flex flex-col gap-8 md:gap-12">
+            {/* Tag */}
+            <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
+              MANIFESTO
+            </div>
+
+            {/* Monumental Statement */}
+            <h2 className="font-headline-lg text-headline-lg uppercase text-white tracking-tight m-0 max-w-5xl leading-none">
+              THE FEED DEMANDS FRICTION, NOT DECORATIVE NOISE.
+            </h2>
+
+            {/* Split Narrative & Studio Focus */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 border-t border-[#262626] items-start">
+              <div className="lg:col-span-7 space-y-6">
+                <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
+                  ÖTZI operates at the intersection of editorial authority and social production—treating digital content with craft, structure, and intentional visual direction.
+                </p>
+                <div className="pt-4">
+                  <ArrowLink href="/about" color="white">
+                    ABOUT THE STUDIO
+                  </ArrowLink>
+                </div>
+              </div>
+
+              {/* Tenets Grid */}
+              <div className="lg:col-span-5 grid grid-cols-1 gap-4 font-label-mono text-label-mono uppercase border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
+                <div className="pb-3 border-b border-[#262626]">
+                  <span className="text-paper-dim block mb-1">DISCIPLINE</span>
+                  <span className="text-white tracking-wider block">SOCIAL MEDIA STRATEGY &amp; CREATIVE PRODUCTION</span>
+                </div>
+                <div className="pb-3 border-b border-[#262626]">
+                  <span className="text-paper-dim block mb-1">APPROACH</span>
+                  <span className="text-white tracking-wider block">EDITORIAL PRECISION &amp; PLATFORM EXECUTION</span>
+                </div>
+                <div>
+                  <span className="text-paper-dim block mb-1">STANDARDS</span>
+                  <span className="text-white tracking-wider block">CONSISTENT QUALITY ACROSS ALL CHANNELS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ====================================================================
+          5. DIRECT ENGAGEMENT CTA
+          ==================================================================== */}
+      <section className="w-full bg-black py-20 md:py-28 overflow-hidden" aria-label="Contact Engagement">
+        <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end">
+            <div className="lg:col-span-8 flex flex-col gap-4">
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
+                <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
+                <span>START A PROJECT</span>
+              </div>
+              <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
+                START A PROJECT.
+              </h2>
+
+              {/* Signature Runway Hairline Arrow */}
+              <HairlineDivider withRunwayArrow />
+
+              <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
+                Open for brand commissions, social media strategy, content production, and creative direction.
+              </p>
+            </div>
+
+            <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-end mt-6 lg:mt-0">
+              <Button
+                variant="accent"
+                href="/contact"
+                className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
+              >
+                INITIATE DIALOGUE
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
