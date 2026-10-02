@@ -12,8 +12,8 @@
   --color-surface-container-highest: #262626;
   --color-line-hairline: #262626;
   --color-line-control: #6b6b6b;
-  --color-primary: #ff2d95;
-  --color-primary-container: #ff2d95;
+  --color-primary: #c1122f;
+  --color-primary-container: #c1122f;
   --color-on-primary: #ffffff;
 
   --font-display: var(--font-space-grotesk), sans-serif;
@@ -55,7 +55,7 @@
   }
 
   ::selection {
-    background-color: #ff2d95;
+    background-color: #c1122f;
     color: #ffffff;
   }
 

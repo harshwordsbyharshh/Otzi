@@ -4,6 +4,13 @@ export type AssetType = "REEL" | "CAROUSEL" | "POST" | "SHORT FILM";
 
 export type PlatformType = "INSTAGRAM" | "TIKTOK" | "YOUTUBE" | "DIGITAL";
 
+export interface ProjectMediaItem {
+  id: string;
+  caption: string;
+  aspectRatio: AspectRatio;
+  assetType: AssetType;
+}
+
 export interface SelectedProject {
   id: string;
   slug: string;
@@ -13,7 +20,13 @@ export interface SelectedProject {
   assetType: AssetType;
   aspectRatio: AspectRatio;
   platform: PlatformType;
+  discipline?: string;
   synopsis?: string;
+  summary?: string;
+  context?: string;
+  execution?: string;
+  deliverables?: string[];
+  mediaSequence?: ProjectMediaItem[];
   thumbnailUrl?: string;
   mediaUrl?: string;
   slidesCount?: number;
@@ -24,5 +37,8 @@ export interface Discipline {
   number: string;
   title: string;
   description: string;
+  scope?: string;
   deliverables: string[];
+  platforms?: string[];
+  methodology?: string[];
 }

@@ -21,23 +21,19 @@ export function Button({
     "inline-flex items-center justify-center font-label-action uppercase tracking-widest transition-colors select-none min-h-[44px] cursor-pointer text-center font-bold";
 
   let variantStyles = "";
-  if (variant === "primary") {
+  if (variant === "primary" || variant === "accent") {
+    // Treatment 1 — Primary CTA: Hairline outlined button, neutral/white structure, no solid crimson fill
     variantStyles =
-      "bg-white text-black hover:bg-primary hover:text-white px-6 py-3.5 border border-transparent";
-  } else if (variant === "accent") {
+      "bg-black text-white border border-white hover:border-primary hover:text-white px-6 py-3.5";
+  } else {
+    // Treatment 2 — Secondary CTA: Understated text + arrow, no border container, no fill
     variantStyles =
-      "bg-primary text-white hover:bg-white hover:text-black px-6 py-3.5 border border-transparent";
-  } else if (variant === "secondary") {
-    variantStyles =
-      "bg-black text-white border border-[#6b6b6b] hover:border-white px-6 py-3.5";
-  } else if (variant === "ghost") {
-    variantStyles =
-      "bg-transparent text-white hover:underline decoration-1 underline-offset-4 px-2 py-2";
+      "bg-transparent text-white border-0 hover:text-primary px-0 py-2";
   }
 
   const arrowElement = arrow ? (
     <span
-      className="ml-2 inline-block transition-transform duration-200 group-hover:translate-x-1"
+      className="ml-2 inline-block transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary"
       aria-hidden="true"
     >
       →
