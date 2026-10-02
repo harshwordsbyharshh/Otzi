@@ -15,12 +15,12 @@ colors:
   inverse-on-surface: '#303030'
   outline: '#a98892'
   outline-variant: '#5a3f48'
-  surface-tint: '#ffb0ca'
-  primary: '#ffb0ca'
-  on-primary: '#640035'
-  primary-container: '#ff479b'
-  on-primary-container: '#58002e'
-  inverse-primary: '#b90067'
+  surface-tint: '#C1122F'
+  primary: '#C1122F'
+  on-primary: '#FFFFFF'
+  primary-container: '#C1122F'
+  on-primary-container: '#FFFFFF'
+  inverse-primary: '#C1122F'
   secondary: '#c6c6c7'
   on-secondary: '#2f3131'
   secondary-container: '#454747'
@@ -33,10 +33,10 @@ colors:
   on-error: '#690005'
   error-container: '#93000a'
   on-error-container: '#ffdad6'
-  primary-fixed: '#ffd9e3'
-  primary-fixed-dim: '#ffb0ca'
-  on-primary-fixed: '#3e001f'
-  on-primary-fixed-variant: '#8d004e'
+  primary-fixed: '#C1122F'
+  primary-fixed-dim: '#C1122F'
+  on-primary-fixed: '#FFFFFF'
+  on-primary-fixed-variant: '#C1122F'
   secondary-fixed: '#e2e2e2'
   secondary-fixed-dim: '#c6c6c7'
   on-secondary-fixed: '#1a1c1c'
@@ -156,7 +156,16 @@ The palette operates under strict hierarchical discipline to maintain an authori
 - **Hairlines (`--line-hairline`, `#262626`):** Structural grid rules, column separators, and card boundaries.
 - **Control Boundaries (`--line-control`, `#6B6B6B`):** Interactive element perimeters, inactive input borders, and wayfinding arrows.
 - **Neutral Surface (`--surface-dim`, `#141414`):** Raw, honest container fill for media placeholders, skeleton states, and component wells.
-- **Accent Magenta (`--m1`, `#FF2D95`):** Hot, unyielding magenta. Strictly governed by an absolute visual surface budget under 5%. Reserved solely for active state indicators, critical CTAs, cursor states, and selected tags. It must never be applied to headlines, background washes, drop-shadows, or gradients.
+- **Canonical Crimson (`--accent-crimson`, `#C1122F`):** The canonical ÖTZI crimson is `#C1122F`. This value is LOCKED and FINAL as the canonical production accent token. Strictly governed by an absolute visual surface budget under 5%. Reserved solely for the arrow motif, active/selected states, appropriate hover/focus accents, restrained brand moments, and selected/active UI states where appropriate.
+  - **Explicit Prohibitions:** No large crimson backgrounds, no giant crimson sections, no excessive crimson text, no filled crimson primary CTA, no gradients, no glow, no neon treatment, no decorative crimson blocks; do not turn the entire interface crimson.
+  - **Historical / Legacy Tokens:** Historical values such as `#FF2D95` or `#E6007E` are HISTORICAL / LEGACY / NOT FOR PRODUCTION. Historical magenta is not an active production token.
+
+### Contrast Requirements & Boundary Verification
+UI and control boundaries must meet at least a 3:1 contrast ratio (WCAG 2.1 AA Non-text Contrast):
+- **White Outlined Control Boundary (`#FFFFFF`) on Canvas (`#000000`):** 21:1 contrast ratio (exceeds 3:1 requirement).
+- **Standard Control Boundary (`--line-control`, `#6B6B6B`) on Canvas (`#000000`):** 5.74:1 contrast ratio (exceeds 3:1 requirement).
+- **Hairline Divider (`--line-hairline`, `#262626`) on Canvas (`#000000`):** 1.5:1 contrast ratio (structural grid division only; not used as an interactive control boundary).
+All interactive control boundaries and the outlined primary CTA border meet and satisfy the 3:1 contrast requirement.
 
 ## Typography
 
@@ -164,7 +173,23 @@ Typography establishes tension through contrast between wide, mechanical display
 
 - **Display & Headlines:** Set in Space Grotesk (utilized for its expanded, geometric impact) with weights calibrated to ExtraBold (800) and Bold (700). Letter-spacing is aggressively pulled tight to lock words into sculptural units. Headline uppercase is applied selectively for manifestos and categorization.
 - **Body & Text Elements:** Set in Hanken Grotesk across regular and medium weights. Line heights remain generous to ensure effortless scanability across technical narratives and campaign briefs.
-- **Technical Labels & Badges:** Rendered in small-scale, tracked-out Hanken Grotesk Bold (`label-mono`) with forced uppercase.
+- **Production Labels & Metadata Standards:** Rendered in small-scale, tracked-out Hanken Grotesk Bold (`label-mono`) with uppercase or small caps where appropriate, wide tracking, and restrained hierarchy. 
+  - **Explicit Label Prohibitions:** Strictly prohibit fake system notation, fake coordinates, fake internal IDs, fake technical metadata, fake stats, fake client names, fake results, fake performance claims, and decorative slashes (`//`). Do not use labels such as:
+    - `"AGENCY POSTURE // 2026"`
+    - `"FRAMEWORK: CROSS-PLATFORM"`
+    - `"ORIENTATION: EDITORIAL"`
+    - `"PORTFOLIO // SELECTED WORK"`
+    - `"[SYS // 2024.1]"`
+    - `"REF // WORK INDEX"`
+    or similar system/debug-style decorative labels.
+  - **Structured Placeholder Standard:** If a project or content placeholder requires a structured label, use `[PROJECT SUMMARY]` rather than invented metadata.
+
+### Hero Copy Specification
+- **Locked Factual Hero Sentence:** Production-facing hero copy is factually locked to:
+  > "ÖTZI is a social media management and creative production agency."
+  Preserving the exact phrase: `"social media management and creative production agency."`
+- **Banned Copy:** The sentence `"The work is the protagonist. The interface is the frame."` is strictly BANNED from production-facing hero copy. Do not use it as live-site copy.
+- **Copy-Only Constraint:** This is a COPY-ONLY correction. Do not change hero layout, hero structure, typography, typography size, spacing, responsive behavior, animation, visual hierarchy, media treatment, arrow treatment, section ordering, or composition. Do not invent new hero claims.
 
 ## Layout & Spacing
 
@@ -186,23 +211,43 @@ Elevation is achieved purely through structural layering, border density, and hi
   - Active, focused, or hoverable structural segments elevate by stepping boundary weights from `#262626` to control white (`#FFFFFF`) or control gray (`#6B6B6B`).
 - **Z-Index Layering (Modal/Flyout):** Floating elements (drawers, overlay navigation) inherit a solid `#000000` ground with a continuous 1px `#FFFFFF` outline, cutting directly through the underlying canvas without blurred backdrops.
 
-## Shapes
+## Shapes & Arrow System
 
 The geometric signature is absolute square-cut construction:
-- **Radius Value:** `0px` across every UI element, container, popover, button, media mask, and checkbox.
+- **Radius Value:** `0px` across every UI element, container, popover, button, media mask, and checkbox. Zero-radius treatment throughout.
 - **Graphic Elements:** Lines, arrows, and tags terminate with hard 90-degree corners.
-- **Wayfinding:** Wayfinding relies exclusively on razor-thin monoline arrows (stroke: 1.5px, 90° or 45° angled arrowheads, unfilleted joinery).
+- **Wayfinding & Arrow System:** The arrow is a functional ÖTZI brand motif communicating direction, movement, progression, and precision.
+  - Wayfinding relies exclusively on razor-thin monoline arrows (stroke: 1.5px, 90° or 45° angled arrowheads, unfilleted joinery).
+  - Canonical crimson (`#C1122F`) is used selectively on interaction/active states.
+  - Restraint: Do not turn every interface element into an arrow decoration.
+  - Maintain the strict one-arrow-per-link principle.
 
 ## Components
 
-### Buttons
-- **Primary CTA:** Solid `#FFFFFF` fill with `#000000` text, 0px radius, 16px vertical by 24px horizontal padding, accompanied by a right-facing monoline arrow (`→`). Hover state: background transforms to hot magenta (`#FF2D95`) with `#FFFFFF` text.
-- **Secondary CTA:** Pure `#000000` fill, 1px `#6B6B6B` border, `#FFFFFF` text. Hover state: border color switches to `#FFFFFF`.
-- **Ghost Action:** Text only in `#FFFFFF` with monoline arrow trailing; borderless; underline appears on hover as a 1px solid rule.
+### Buttons & CTA System
+There are EXACTLY TWO button/link treatments in the entire design system. There is NO third button variant.
+
+- **Treatment 1 — Primary CTA (Hairline Outlined Button):**
+  - Outlined hairline button with zero-radius (`0px`).
+  - 1px hairline border (`#FFFFFF` or `#6B6B6B`, meeting the 3:1 contrast requirement).
+  - Neutral/white structural treatment with `#000000` background fill and `#FFFFFF` text.
+  - NO filled crimson background; NO solid crimson button.
+  - Canonical crimson (`#C1122F`) may be used ONLY for the arrow / accent / interaction state on hover/focus.
+  - Restrained editorial treatment; padding 16px vertical by 24px horizontal.
+  - Accompanied by a right-facing monoline arrow (`→`).
+  - Applies to the header "START A PROJECT" CTA and primary CTA actions across the site.
+- **Treatment 2 — Secondary CTA (Understated Text + Arrow Link):**
+  - Understated editorial text link with trailing monoline arrow.
+  - NO filled background.
+  - NO border container.
+  - NO pill.
+  - NO rounded button.
+  - Neutral text (`#FFFFFF` or `#A3A3A3`); arrow motif may become canonical crimson (`#C1122F`) on appropriate interaction.
+- **Variant Restriction:** Strictly prohibited to introduce any third button variant. No ghost button with separate underline containers, no pill buttons, and no filled crimson CTAs.
 
 ### Chips & Badges
 - **Status/Category Chip:** Rectangular container, 0px radius, 1px `#262626` outline, `#000000` background. Text is uppercase `label-mono` in `#A3A3A3`.
-- **Selected Tag:** 1px `#FF2D95` border, `#000000` background, `#FF2D95` text. No rounded pill geometry.
+- **Selected Tag:** 1px `#C1122F` border, `#000000` background, `#C1122F` text. Zero-radius; no rounded pill geometry.
 
 ### Cards
 - Zero-radius panels bordered by a 1px `#262626` hairline. 
@@ -210,14 +255,20 @@ The geometric signature is absolute square-cut construction:
 - Imagery never bleeds with soft vignettes; cards snap cleanly into the column grid.
 
 ### Input Fields & Controls
-- **Text Inputs:** Solid `#000000` background, 1px `#6B6B6B` bottom or full-box border, 0px radius. Placeholder copy in `#A3A3A3`. Active/Focus state: 1px `#FFFFFF` border with a stationary 2px `#FF2D95` indicator notch in the upper-right corner.
-- **Checkboxes:** 18x18px square, 1px `#6B6B6B` border, `#000000` background. Checked state: solid `#FF2D95` fill with a sharp, inverted black checkmark.
-- **Radio Buttons:** 18x18px square (no circles), 1px `#6B6B6B` border. Selected state: solid 8x8px `#FF2D95` square centered within.
+- **Text Inputs:** Solid `#000000` background, 1px `#6B6B6B` bottom or full-box border, 0px radius. Placeholder copy in `#A3A3A3`. Active/Focus state: 1px `#FFFFFF` border with a stationary 2px `#C1122F` indicator notch in the upper-right corner.
+- **Checkboxes:** 18x18px square, 1px `#6B6B6B` border, `#000000` background. Checked state: solid `#C1122F` fill with a sharp, inverted black checkmark.
+- **Radio Buttons:** 18x18px square (no circles), 1px `#6B6B6B` border. Selected state: solid 8x8px `#C1122F` square centered within.
 
 ### Lists & Tables
 - Divided horizontally by 1px `#262626` rules.
-- Row hover triggers an instantaneous change of the row's background to `#141414` alongside an active monoline arrow sliding in from the left margin.
+- Row hover triggers an instantaneous change of the row's background to `#141414` alongside an active monoline arrow sliding in from the left margin (becoming `#C1122F`).
 
 ### Media Placeholders
 - Honest `#141414` fill with ultra-subtle corner crosshairs rendered in `#262626`.
-- Strictly no stock photography, mock gradients, or shimmer waves; loading states utilize stepped, monospaced text indicators (e.g., `LOAD // 084%`).
+- Strictly no stock photography, mock gradients, or shimmer waves. Loading states utilize clean, restrained editorial indicators or `[PROJECT SUMMARY]` placeholders; strictly no fake debug notation, no `//` notation, no fake loading percentages, and no mock progress bars.
+
+## Content Safety & Truthfulness
+
+The documentation must remain production-safe and truthful:
+- **No Inventions:** Never invent fake clients, campaign results, performance statistics, awards, locations, team size, capabilities that are not established, fake testimonials, or fake case-study outcomes.
+- **Placeholder Standards:** Placeholder portfolio content is acceptable where actual production content is not yet available, structured with neutral labels such as `[PROJECT SUMMARY]` rather than invented metadata.
