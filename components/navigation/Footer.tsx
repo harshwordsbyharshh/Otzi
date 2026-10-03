@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   const scrollToTop = () => {
@@ -41,15 +43,6 @@ export function Footer() {
                 <span aria-hidden="true">→</span>
               </a>
               <a
-                href="https://are.na"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-paper-dim hover:text-primary transition-colors inline-flex items-center gap-1.5"
-              >
-                <span>ARE.NA</span>
-                <span aria-hidden="true">→</span>
-              </a>
-              <a
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -71,8 +64,19 @@ export function Footer() {
               <span>BACK TO TOP</span>
               <span aria-hidden="true">↑</span>
             </button>
-            <div className="font-label-mono text-label-mono text-paper-dim uppercase tracking-widest">
-              ÖTZI SOCIAL &amp; CREATIVE AGENCY
+            <div className="flex flex-col items-start md:items-end gap-2.5">
+              <Link href="/" aria-label="ÖTZI Agency Home" className="block select-none">
+                <Image
+                  src="/logo.png"
+                  alt="ötzi"
+                  width={1024}
+                  height={409}
+                  className="h-6 w-auto object-contain"
+                />
+              </Link>
+              <div className="font-label-mono text-label-mono text-paper-dim uppercase tracking-widest">
+                ÖTZI SOCIAL &amp; CREATIVE AGENCY
+              </div>
             </div>
           </div>
         </div>

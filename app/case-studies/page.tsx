@@ -6,7 +6,7 @@ import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "CASE STUDIES — Production Briefs & Telemetry | ÖTZI",
+  title: "CASE STUDIES — Production Briefs & Formats | ÖTZI",
   description:
     "Explore ÖTZI case studies detailing creative direction, multi-format media execution, and platform delivery across social media and digital channels.",
 };
@@ -34,7 +34,7 @@ export default function CaseStudiesPage() {
               id="case-studies-heading"
               className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none"
             >
-              EDITORIAL BRIEFS &amp; EXECUTION TELEMETRY.
+              EDITORIAL BRIEFS &amp; PRODUCTION FORMATS.
             </h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 border-t border-[#262626] items-start">
@@ -42,33 +42,16 @@ export default function CaseStudiesPage() {
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
                   Documented creative briefs, strategic directives, and multi-format asset sequences. Each case study details format optimization, typography parameters, and cross-channel release architecture.
                 </p>
-                <div className="border border-[#262626] p-4 bg-surface-container-low max-w-2xl">
-                  <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-widest block font-bold mb-1">
-                    PRODUCTION TELEMETRY NOTICE
-                  </span>
-                  <p className="font-body-sm text-body-sm text-paper-dim m-0 leading-relaxed text-xs">
-                    Live performance telemetry and audience analytics are securely connected through verified client telemetry pipelines in Phase 3. Case study summaries below focus on verified creative and format execution.
-                  </p>
-                </div>
               </div>
 
-              {/* Summary Stats / Scope */}
+              {/* Archive Index */}
               <div className="lg:col-span-4 flex flex-col gap-3 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
                 <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold block">
-                  ARCHIVE METRICS
+                  ARCHIVE OVERVIEW
                 </span>
-                <div className="grid grid-cols-2 gap-3 text-label-mono font-label-mono uppercase">
-                  <div className="border border-[#262626] p-3 bg-surface-container-low">
-                    <span className="text-primary font-bold text-lg block">
-                      {allProjects.length.toString().padStart(2, "0")}
-                    </span>
-                    <span className="text-paper-dim text-[10px]">CASE STUDIES</span>
-                  </div>
-                  <div className="border border-[#262626] p-3 bg-surface-container-low">
-                    <span className="text-white font-bold text-lg block">04</span>
-                    <span className="text-paper-dim text-[10px]">RATIOS DEPLOYED</span>
-                  </div>
-                </div>
+                <p className="font-body-sm text-body-sm text-paper-dim m-0 leading-relaxed text-xs">
+                  Portfolio archive cataloging multi-format productions across vertical reels, editorial carousels, square still assets, and narrative films.
+                </p>
               </div>
             </div>
           </div>
@@ -116,10 +99,10 @@ export default function CaseStudiesPage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>CASE STUDY INQUIRIES</span>
+                <span>BOOK OUR SERVICES</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                START A PROJECT.
+                BOOK OUR SERVICES.
               </h2>
               <HairlineDivider withRunwayArrow />
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
@@ -132,7 +115,7 @@ export default function CaseStudiesPage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                INITIATE DIALOGUE
+                BOOK OUR SERVICES
               </Button>
             </div>
           </div>

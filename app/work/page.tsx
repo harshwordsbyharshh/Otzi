@@ -136,10 +136,10 @@ export default function WorkIndexPage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>COMMISSION WORK</span>
+                <span>BOOK OUR SERVICES</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                START A PROJECT.
+                BOOK OUR SERVICES.
               </h2>
               <HairlineDivider withRunwayArrow />
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
@@ -152,7 +152,7 @@ export default function WorkIndexPage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                INITIATE DIALOGUE
+                BOOK OUR SERVICES
               </Button>
             </div>
           </div>

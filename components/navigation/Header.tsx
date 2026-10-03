@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { MobileNav } from "./MobileNav";
@@ -34,10 +35,17 @@ export function Header() {
           <div className="flex items-center">
             <Link
               href="/"
-              className="font-headline-md text-headline-md tracking-tighter uppercase text-white hover:text-primary transition-colors select-none font-bold"
+              className="flex items-center focus:outline-none focus-visible:ring-1 focus-visible:ring-white select-none"
               aria-label="ÖTZI Agency Home"
             >
-              ÖTZI
+              <Image
+                src="/logo.png"
+                alt="ötzi"
+                width={1024}
+                height={409}
+                priority
+                className="h-7 sm:h-8 md:h-8 w-auto object-contain"
+              />
             </Link>
           </div>
 
@@ -73,7 +81,7 @@ export function Header() {
               href="/contact"
               className="text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-2.5"
             >
-              START A PROJECT
+              BOOK OUR SERVICES
             </Button>
 
             {/* Mobile Hamburger Toggle Button */}

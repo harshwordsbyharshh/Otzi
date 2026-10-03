@@ -84,7 +84,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
           onClick={onClose}
           className="w-full text-center py-4"
         >
-          START A PROJECT
+          BOOK OUR SERVICES
         </Button>
         <div className="flex justify-between items-center text-label-mono font-label-mono text-paper-dim uppercase pt-2">
           <span>ÖTZI STUDIO</span>

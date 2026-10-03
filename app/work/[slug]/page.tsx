@@ -91,8 +91,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
 
           {/* Factual Metadata Matrix */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 border-t border-[#262626] pt-8">
-            <div className="border border-[#262626] p-4 bg-surface-container-low">
-              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
+            <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
+              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
                 CLIENT
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
@@ -100,8 +100,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               </span>
             </div>
 
-            <div className="border border-[#262626] p-4 bg-surface-container-low">
-              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
+            <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
+              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
                 YEAR
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
@@ -109,8 +109,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               </span>
             </div>
 
-            <div className="border border-[#262626] p-4 bg-surface-container-low">
-              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
+            <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
+              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
                 ASPECT RATIO
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
@@ -118,8 +118,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               </span>
             </div>
 
-            <div className="border border-[#262626] p-4 bg-surface-container-low">
-              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
+            <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
+              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
                 ASSET TYPE
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
@@ -127,8 +127,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               </span>
             </div>
 
-            <div className="border border-[#262626] p-4 bg-surface-container-low">
-              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
+            <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
+              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
                 PLATFORM
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
@@ -136,8 +136,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               </span>
             </div>
 
-            <div className="border border-[#262626] p-4 bg-surface-container-low">
-              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
+            <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
+              <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
                 DISCIPLINE
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block truncate">
@@ -213,7 +213,7 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               )}
             </div>
 
-            {/* Right Specification Block: Deliverables & Telemetry Note */}
+            {/* Right Specification Block: Deliverables */}
             <div className="lg:col-span-4 flex flex-col gap-6 border-t lg:border-t-0 lg:border-l border-[#262626] pt-8 lg:pt-0 lg:pl-8">
               <div className="space-y-4">
                 <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold block">
@@ -226,20 +226,10 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
                       className="border border-[#262626] p-3 font-label-mono text-label-mono uppercase tracking-wider text-white bg-surface-container-low flex items-center justify-between"
                     >
                       <span>{item}</span>
-                      <span className="text-primary font-bold">✓</span>
+                      <span className="text-paper-dim font-bold">+</span>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Verified Production Pipeline Notice */}
-              <div className="border border-[#262626] p-4 bg-surface-container-lowest space-y-2">
-                <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-widest block font-bold">
-                  DATA INTEGRATION NOTICE
-                </span>
-                <p className="font-body-sm text-body-sm text-paper-dim m-0 leading-relaxed text-xs">
-                  Production telemetry and live engagement metrics for this project will be integrated from verified client telemetry streams in future development phases.
-                </p>
               </div>
             </div>
           </div>
@@ -344,7 +334,7 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
             </p>
           </div>
           <Button variant="primary" href="/contact" className="px-8 py-4 text-sm font-bold shrink-0">
-            START A PROJECT
+            BOOK OUR SERVICES
           </Button>
         </div>
       </section>

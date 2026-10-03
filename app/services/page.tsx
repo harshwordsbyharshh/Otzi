@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 export const metadata: Metadata = {
   title: "SERVICES — Five Core Disciplines | ÖTZI",
   description:
-    "Explore ÖTZI's five core disciplines: Social Media Strategy, Content, Creative, Digital, and Distribution engineered for cultural velocity and digital authority.",
+    "Explore ÖTZI's five core disciplines: Social Media Management & Marketing, AI Agents, Paid Ad Management, Google Business Profile Management, and SEO Management.",
 };
 
 export default function ServicesPage() {
@@ -45,7 +45,7 @@ export default function ServicesPage() {
                 </p>
                 <div className="pt-2">
                   <Button variant="primary" href="/contact">
-                    COMMISSION AN ENGAGEMENT
+                    BOOK OUR SERVICES
                   </Button>
                 </div>
               </div>
@@ -100,6 +100,11 @@ export default function ServicesPage() {
                   <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
                     {discipline.title}
                   </h2>
+                  {discipline.subDescription && (
+                    <div className="font-label-mono text-xs uppercase tracking-widest text-primary font-bold">
+                      {discipline.subDescription}
+                    </div>
+                  )}
                   <div className="pt-2">
                     <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-widest block mb-2 font-bold">
                       RELEVANT PLATFORMS
@@ -130,18 +135,27 @@ export default function ServicesPage() {
 
                   {/* Deliverables & Methodology Split */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                    {/* Deliverables */}
+                    {/* Deliverables / Sub-services */}
                     <div className="border border-[#262626] p-5 bg-surface-container-low space-y-3">
                       <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold block">
-                        CORE DELIVERABLES
+                        {discipline.subServices ? "SUB-SERVICES" : "CORE DELIVERABLES"}
                       </span>
                       <ul className="space-y-2 p-0 m-0 list-none font-label-mono text-xs text-white uppercase tracking-wider">
-                        {discipline.deliverables.map((item, dIdx) => (
-                          <li key={dIdx} className="flex items-center gap-2">
-                            <span className="text-primary font-bold">+</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
+                        {discipline.subServices ? (
+                          discipline.subServices.map((sub, sIdx) => (
+                            <li key={sIdx} className="flex items-center gap-2">
+                              <span className="text-primary font-bold">•</span>
+                              <span>{sub}</span>
+                            </li>
+                          ))
+                        ) : (
+                          discipline.deliverables.map((item, dIdx) => (
+                            <li key={dIdx} className="flex items-center gap-2">
+                              <span className="text-primary font-bold">+</span>
+                              <span>{item}</span>
+                            </li>
+                          ))
+                        )}
                       </ul>
                     </div>
 
@@ -176,10 +190,10 @@ export default function ServicesPage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>INTEGRATED CAMPAIGNS</span>
+                <span>BOOK OUR SERVICES</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                START A PROJECT.
+                BOOK OUR SERVICES.
               </h2>
               <HairlineDivider withRunwayArrow />
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
@@ -192,7 +206,7 @@ export default function ServicesPage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                INITIATE DIALOGUE
+                BOOK OUR SERVICES
               </Button>
             </div>
           </div>

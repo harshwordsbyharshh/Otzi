@@ -36,6 +36,8 @@ export interface Discipline {
   id: string;
   number: string;
   title: string;
+  subDescription?: string;
+  subServices?: string[];
   description: string;
   scope?: string;
   deliverables: string[];

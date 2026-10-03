@@ -7,14 +7,12 @@ import { Footer } from "@/components/navigation/Footer";
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
-  weight: ["500", "700"],
   display: "swap",
 });
 
 const hankenGrotesk = Hanken_Grotesk({
   variable: "--font-hanken-grotesk",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
   display: "swap",
 });
 

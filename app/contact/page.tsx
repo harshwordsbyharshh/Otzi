@@ -48,7 +48,7 @@ export default function ContactPage() {
               id="contact-heading"
               className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none"
             >
-              START A PROJECT.
+              BOOK OUR SERVICES.
             </h1>
 
             <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0 border-t border-[#262626] pt-6">
@@ -97,15 +97,6 @@ export default function ContactPage() {
                     <span aria-hidden="true">→</span>
                   </a>
                   <a
-                    href="https://are.na"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between text-white hover:text-primary transition-colors border-b border-[#262626] pb-2 min-h-[44px]"
-                  >
-                    <span>ARE.NA</span>
-                    <span aria-hidden="true">→</span>
-                  </a>
-                  <a
                     href="https://linkedin.com"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -115,16 +106,6 @@ export default function ContactPage() {
                     <span aria-hidden="true">→</span>
                   </a>
                 </div>
-              </div>
-
-              {/* Backend Notice */}
-              <div className="border border-[#262626] p-5 bg-surface-container-low space-y-2">
-                <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-widest font-bold block">
-                  DEPLOYMENT NOTICE
-                </span>
-                <p className="font-body-sm text-body-sm text-paper-dim m-0 leading-relaxed text-xs">
-                  This interface provides the full accessible form architecture for Phase 2B. Direct email routing and API dispatch will be connected in future deployment phases.
-                </p>
               </div>
             </div>
 
@@ -140,7 +121,7 @@ export default function ContactPage() {
                       INQUIRY RECORDED
                     </span>
                     <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-                      THANK YOU FOR INITIATING DIALOGUE.
+                      THANK YOU FOR YOUR INQUIRY.
                     </h2>
                     <p className="font-body-md text-body-md text-paper-dim leading-relaxed max-w-xl m-0">
                       Your inquiry parameters have been registered on the client interface. For immediate direct correspondence, you may also email us directly at{" "}
@@ -284,7 +265,7 @@ export default function ContactPage() {
                     {/* Submit Button */}
                     <div className="pt-4 border-t border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <Button type="submit" variant="primary" className="w-full sm:w-auto px-8 py-4 text-sm font-bold">
-                        INITIATE DIALOGUE
+                        BOOK OUR SERVICES
                       </Button>
                       <span className="font-label-mono text-[11px] text-paper-dim uppercase tracking-wider">
                         DIRECT BRAND INQUIRIES

@@ -7,12 +7,12 @@ import { disciplinesData, selectedProjectsData } from "@/lib/data/homepage";
 
 export default function HomePage() {
   const reelProject = selectedProjectsData.find((p) => p.aspectRatio === "9:16") || selectedProjectsData[0];
-  const carouselProject = selectedProjectsData.find((p) => p.aspectRatio === "4:5") || selectedProjectsData[1];
-  const squareProject = selectedProjectsData.find((p) => p.aspectRatio === "1:1") || selectedProjectsData[2];
-  const cinemaProject = selectedProjectsData.find((p) => p.aspectRatio === "16:9") || selectedProjectsData[3];
+  const carouselProject = selectedProjectsData.find((p) => p.aspectRatio === "4:5") || selectedProjectsData[1] || selectedProjectsData[0];
+  const squareProject = selectedProjectsData.find((p) => p.aspectRatio === "1:1") || selectedProjectsData[2] || selectedProjectsData[0];
+  const cinemaProject = selectedProjectsData.find((p) => p.aspectRatio === "16:9") || selectedProjectsData[3] || selectedProjectsData[0];
 
   return (
-    <div className="flex flex-col w-full bg-black min-h-screen">
+    <div className="flex flex-col w-full bg-black flex-1">
       {/* ====================================================================
           1. HERO SECTION
           ==================================================================== */}
@@ -40,7 +40,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex flex-wrap gap-4 pt-4">
                   <Button variant="accent" href="/contact">
-                    START A PROJECT
+                    BOOK OUR SERVICES
                   </Button>
                   <Button variant="secondary" href="/work">
                     EXPLORE WORK
@@ -221,10 +221,10 @@ export default function HomePage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>START A PROJECT</span>
+                <span>BOOK OUR SERVICES</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                START A PROJECT.
+                BOOK OUR SERVICES.
               </h2>
 
               {/* Signature Runway Hairline Arrow */}
@@ -241,7 +241,7 @@ export default function HomePage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                INITIATE DIALOGUE
+                BOOK OUR SERVICES
               </Button>
             </div>
           </div>
