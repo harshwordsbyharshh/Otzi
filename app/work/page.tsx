@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import { getAllProjects } from "@/lib/data/homepage";
+import { getPublishedProjects } from "@/lib/supabase/projects";
 import { ProjectCard } from "@/components/portfolio/ProjectCard";
 import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { Button } from "@/components/ui/Button";
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     "Explore ÖTZI's portfolio of social media management and creative productions spanning vertical reels, editorial carousels, square still assets, and widescreen narrative cuts.",
 };
 
-export default function WorkIndexPage() {
-  const allProjects = getAllProjects();
+export default async function WorkIndexPage() {
+  const allProjects = await getPublishedProjects();
 
   return (
     <div className="flex flex-col w-full bg-black min-h-screen">
@@ -105,14 +105,14 @@ export default function WorkIndexPage() {
           {/* Primary Asymmetric Cluster: Vertical 9:16 + 4:5 Carousel & 1:1 Still */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-5">
-              <ProjectCard project={allProjects[0]} basePath="work" />
+              {allProjects[0] && <ProjectCard project={allProjects[0]} basePath="work" />}
             </div>
             <div className="lg:col-span-7 flex flex-col gap-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <ProjectCard project={allProjects[1]} basePath="work" />
-                <ProjectCard project={allProjects[2]} basePath="work" />
+                {allProjects[1] && <ProjectCard project={allProjects[1]} basePath="work" />}
+                {allProjects[2] && <ProjectCard project={allProjects[2]} basePath="work" />}
               </div>
-              <ProjectCard project={allProjects[3]} basePath="work" />
+              {allProjects[3] && <ProjectCard project={allProjects[3]} basePath="work" />}
             </div>
           </div>
 
@@ -120,10 +120,21 @@ export default function WorkIndexPage() {
           <HairlineDivider />
 
           {/* Secondary Balanced Grid: Remaining Productions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            <ProjectCard project={allProjects[4]} basePath="work" />
-            <ProjectCard project={allProjects[5]} basePath="work" />
-          </div>
+          {allProjects.length > 4 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              {allProjects[4] && <ProjectCard project={allProjects[4]} basePath="work" />}
+              {allProjects[5] && <ProjectCard project={allProjects[5]} basePath="work" />}
+            </div>
+          )}
+
+          {/* Additional Productions Grid */}
+          {allProjects.length > 6 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-8 border-t border-[#262626]">
+              {allProjects.slice(6).map((project) => (
+                <ProjectCard key={project.id} project={project} basePath="work" />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

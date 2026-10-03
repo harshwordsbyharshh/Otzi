@@ -30,7 +30,28 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Modern Supabase SSR pattern: verify session/token claims and refresh auth tokens
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+
+  const pathname = request.nextUrl.pathname;
+
+  // Protect /admin routes (except /admin/login)
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    if (!data?.claims) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/admin/login";
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
+  // If already authenticated and visiting /admin/login, redirect to /admin/dashboard unless in an error state
+  if (pathname === "/admin/login" && data?.claims) {
+    const isUnauthorized = request.nextUrl.searchParams.get("error") === "unauthorized";
+    if (!isUnauthorized) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/admin/dashboard";
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
 
   return supabaseResponse;
 }

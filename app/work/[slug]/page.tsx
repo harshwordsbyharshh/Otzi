@@ -2,7 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllProjects, getProjectBySlug } from "@/lib/data/homepage";
+import { getAllProjects } from "@/lib/data/homepage";
+import { getPublishedProjects, getPublishedProjectBySlug } from "@/lib/supabase/projects";
 import { MediaFrame } from "@/components/media/MediaFrame";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Button } from "@/components/ui/Button";
@@ -24,7 +25,7 @@ export async function generateMetadata({
   params,
 }: WorkDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getPublishedProjectBySlug(slug);
 
   if (!project) {
     return {
@@ -42,17 +43,22 @@ export async function generateMetadata({
 
 export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getPublishedProjectBySlug(slug);
 
   if (!project) {
     notFound();
   }
 
-  const allProjects = getAllProjects();
+  const allProjects = await getPublishedProjects();
   const currentIndex = allProjects.findIndex((p) => p.slug === slug);
-  const nextProject = allProjects[(currentIndex + 1) % allProjects.length];
+  const nextProject =
+    currentIndex !== -1
+      ? allProjects[(currentIndex + 1) % allProjects.length]
+      : allProjects[0];
   const prevProject =
-    allProjects[(currentIndex - 1 + allProjects.length) % allProjects.length];
+    currentIndex !== -1
+      ? allProjects[(currentIndex - 1 + allProjects.length) % allProjects.length]
+      : allProjects[0];
 
   return (
     <div className="flex flex-col w-full bg-black min-h-screen">
