@@ -114,7 +114,7 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 border-t border-[#262626] pt-8">
             <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
               <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
-                CLIENT
+                {project.client === "STUDIO PRODUCTION" ? "PRODUCTION" : "CLIENT"}
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
                 {project.client}
@@ -351,23 +351,23 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
       </section>
 
       {/* ====================================================================
-          7. DIRECT ENGAGEMENT CTA STRIP
+          7. START A PROJECT CTA STRIP
           ==================================================================== */}
-      <section className="w-full bg-black py-20" aria-label="Direct Engagement">
+      <section className="w-full bg-black py-20" aria-label="Start a project">
         <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 border border-[#262626] p-8 md:p-12 bg-surface-container-low">
           <div className="space-y-2 max-w-2xl">
             <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold block">
-              ENGAGEMENT
+              START A PROJECT
             </span>
             <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-              COMMISSION A SIMILAR PRODUCTION.
+              START A PROJECT WITH ÖTZI.
             </h2>
             <p className="font-body-md text-body-md text-paper-dim m-0">
-              Open for selective brand commissions, multi-format media production, and social campaign direction.
+              Have a project in mind? Tell us what you&apos;re building and where you want to take it.
             </p>
           </div>
           <Button variant="primary" href="/contact" className="px-8 py-4 text-sm font-bold shrink-0">
-            BOOK OUR SERVICES
+            START A PROJECT →
           </Button>
         </div>
       </section>

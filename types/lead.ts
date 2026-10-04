@@ -1,9 +1,10 @@
 export const ALLOWED_DISCIPLINES = [
-  "SOCIAL MEDIA STRATEGY",
-  "CONTENT PRODUCTION",
-  "CREATIVE DIRECTION",
-  "DIGITAL ACTIVATION",
-  "DISTRIBUTION & CADENCE",
+  "Social Media Management & Marketing",
+  "AI Agents",
+  "Paid Ad Management",
+  "Google Business Profile Management",
+  "SEO Management",
+  "Creative Production",
 ] as const;
 
 export type AllowedDiscipline = (typeof ALLOWED_DISCIPLINES)[number];

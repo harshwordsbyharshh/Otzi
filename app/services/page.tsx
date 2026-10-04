@@ -35,26 +35,26 @@ export default function ServicesPage() {
           <div className="flex flex-col gap-6 md:gap-8">
             <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
               <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-              <span>CAPABILITIES &amp; ARCHITECTURE</span>
+              <span>OUR SERVICES</span>
             </div>
 
             <h1
               id="services-heading"
               className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none"
             >
-              FIVE DISCIPLINES.
+              FIVE SERVICES.
               <br />
-              ZERO DECORATIVE NOISE.
+              ONE CLEAR DIRECTION.
             </h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 border-t border-[#262626] items-start">
               <div className="lg:col-span-7 space-y-4">
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
-                  ÖTZI operates across five integrated creative disciplines designed to build and command social presence. We combine strategic positioning, editorial craft, and format-specific distribution.
+                  ÖTZI helps brands build a stronger digital presence through social media, creative production, advertising, AI-powered systems, Google Business, and SEO.
                 </p>
                 <div className="pt-2">
                   <Button variant="primary" href="/contact">
-                    BOOK OUR SERVICES
+                    START A PROJECT →
                   </Button>
                 </div>
               </div>
@@ -62,7 +62,7 @@ export default function ServicesPage() {
               {/* Index of Disciplines */}
               <div className="lg:col-span-5 flex flex-col gap-3 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
                 <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold">
-                  DISCIPLINE DIRECTORY
+                  OUR SERVICES
                 </div>
                 <div className="space-y-2">
                   {disciplines.map((d) => (
@@ -116,7 +116,7 @@ export default function ServicesPage() {
                   )}
                   <div className="pt-2">
                     <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-widest block mb-2 font-bold">
-                      RELEVANT PLATFORMS
+                      PLATFORMS
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {discipline.platforms?.map((platform, pIdx) => (
@@ -144,34 +144,25 @@ export default function ServicesPage() {
 
                   {/* Deliverables & Methodology Split */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                    {/* Deliverables / Sub-services */}
+                    {/* Services Included */}
                     <div className="border border-[#262626] p-5 bg-surface-container-low space-y-3">
                       <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold block">
-                        {discipline.subServices ? "SUB-SERVICES" : "CORE DELIVERABLES"}
+                        SERVICES
                       </span>
                       <ul className="space-y-2 p-0 m-0 list-none font-label-mono text-xs text-white uppercase tracking-wider">
-                        {discipline.subServices ? (
-                          discipline.subServices.map((sub, sIdx) => (
-                            <li key={sIdx} className="flex items-center gap-2">
-                              <span className="text-primary font-bold">•</span>
-                              <span>{sub}</span>
-                            </li>
-                          ))
-                        ) : (
-                          discipline.deliverables.map((item, dIdx) => (
-                            <li key={dIdx} className="flex items-center gap-2">
-                              <span className="text-primary font-bold">+</span>
-                              <span>{item}</span>
-                            </li>
-                          ))
-                        )}
+                        {discipline.deliverables.map((item, dIdx) => (
+                          <li key={dIdx} className="flex items-center gap-2">
+                            <span className="text-primary font-bold">+</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
                     {/* Methodology */}
                     <div className="border border-[#262626] p-5 bg-surface-container-low space-y-3">
                       <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold block">
-                        METHODOLOGY &amp; RIGOR
+                        METHODOLOGY
                       </span>
                       <ul className="space-y-2 p-0 m-0 list-none font-body-sm text-xs text-paper-dim leading-relaxed">
                         {discipline.methodology?.map((step, sIdx) => (
@@ -199,14 +190,14 @@ export default function ServicesPage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>BOOK OUR SERVICES</span>
+                <span>START A PROJECT</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                BOOK OUR SERVICES.
+                START A PROJECT.
               </h2>
               <HairlineDivider withRunwayArrow />
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
-                We take on brand engagements across strategy, multi-format content creation, and scheduled distribution.
+                Tell us what you need. We&apos;ll take it from there.
               </p>
             </div>
             <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-end mt-6 lg:mt-0">
@@ -215,7 +206,7 @@ export default function ServicesPage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                BOOK OUR SERVICES
+                START A PROJECT →
               </Button>
             </div>
           </div>

@@ -2,7 +2,7 @@ export type AspectRatio = "9:16" | "4:5" | "1:1" | "16:9";
 
 export type AssetType = "REEL" | "CAROUSEL" | "POST" | "SHORT FILM";
 
-export type PlatformType = "INSTAGRAM" | "TIKTOK" | "YOUTUBE" | "DIGITAL";
+export type PlatformType = "INSTAGRAM" | "YOUTUBE" | "X" | "DIGITAL";
 
 export interface ProjectMediaItem {
   id: string;

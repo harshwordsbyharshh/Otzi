@@ -36,30 +36,30 @@ export default function CaseStudiesPage() {
           <div className="flex flex-col gap-6 md:gap-8">
             <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
               <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-              <span>CASE STUDIES ARCHIVE</span>
+              <span>CASE STUDIES</span>
             </div>
 
             <h1
               id="case-studies-heading"
               className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none"
             >
-              EDITORIAL BRIEFS &amp; PRODUCTION FORMATS.
+              THE WORK BEHIND THE WORK.
             </h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 border-t border-[#262626] items-start">
               <div className="lg:col-span-8 space-y-4">
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
-                  Documented creative briefs, strategic directives, and multi-format asset sequences. Each case study details format optimization, typography parameters, and cross-channel release architecture.
+                  A closer look at selected ÖTZI projects — the work, the creative approach, and the execution behind each production.
                 </p>
               </div>
 
-              {/* Archive Index */}
-              <div className="lg:col-span-4 flex flex-col gap-3 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
-                <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold block">
-                  ARCHIVE OVERVIEW
+              {/* Case Study Index */}
+              <div className="lg:col-span-4 flex flex-col gap-2 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
+                <span className="font-label-mono text-label-mono uppercase tracking-widest text-white font-bold block">
+                  CASE STUDY INDEX
                 </span>
                 <p className="font-body-sm text-body-sm text-paper-dim m-0 leading-relaxed text-xs">
-                  Portfolio archive cataloging multi-format productions across vertical reels, editorial carousels, square still assets, and narrative films.
+                  Explore selected ÖTZI projects and the work behind each production.
                 </p>
               </div>
             </div>
@@ -74,15 +74,12 @@ export default function CaseStudiesPage() {
         <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 space-y-16">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#262626] pb-6 gap-4">
             <div>
-              <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold block mb-1">
-                ANALYSIS
-              </span>
-              <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-                DOCUMENTED PRODUCTIONS
+              <h2 className="font-display-sm text-display-sm uppercase tracking-tight text-white m-0 font-bold">
+                SELECTED CASE STUDIES
               </h2>
-            </div>
-            <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim">
-              SELECT ANY CASE STUDY TO INSPECT
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold mt-1">
+                EXPLORE THE WORK IN DETAIL.
+              </div>
             </div>
           </div>
 
@@ -108,14 +105,14 @@ export default function CaseStudiesPage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>BOOK OUR SERVICES</span>
+                <span>START A PROJECT</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                BOOK OUR SERVICES.
+                START A PROJECT.
               </h2>
               <HairlineDivider withRunwayArrow />
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
-                Learn how ÖTZI can structure, produce, and distribute a custom multi-format campaign for your brand.
+                Tell us what you need and where you want to take it.
               </p>
             </div>
             <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-end mt-6 lg:mt-0">
@@ -124,7 +121,7 @@ export default function CaseStudiesPage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                BOOK OUR SERVICES
+                START A PROJECT →
               </Button>
             </div>
           </div>

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "START A PROJECT — Direct Brand Inquiries",
+  title: "START A PROJECT — Let's Work Together",
   description:
-    "Engage ÖTZI for selective brand commissions, ongoing social ecosystem management, dynamic motion infrastructure, and creative production.",
+    "Tell us what you're looking to build, improve, or manage. We'll review your inquiry and get back to you directly.",
   alternates: {
     canonical: "/contact",
   },
   openGraph: {
-    title: "START A PROJECT — Direct Brand Inquiries | ÖTZI",
+    title: "START A PROJECT — Let's Work Together | ÖTZI",
     description:
-      "Engage ÖTZI for selective brand commissions, ongoing social ecosystem management, dynamic motion infrastructure, and creative production.",
+      "Tell us what you're looking to build, improve, or manage. We'll review your inquiry and get back to you directly.",
     url: "/contact",
   },
 };

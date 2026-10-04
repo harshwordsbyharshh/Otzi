@@ -37,7 +37,7 @@ export default async function WorkIndexPage() {
             {/* Header Accent Motif */}
             <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
               <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-              <span>PORTFOLIO INDEX</span>
+              <span>SELECTED WORK</span>
             </div>
 
             {/* Monumental Page Headline */}
@@ -45,17 +45,17 @@ export default async function WorkIndexPage() {
               id="work-heading"
               className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none"
             >
-              SELECTED PRODUCTIONS &amp; CAMPAIGN SUITES.
+              SELECTED WORK.
             </h1>
 
             {/* Two-Column Editorial Intro & Format Matrix */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 border-t border-[#262626] items-start">
               <div className="lg:col-span-7 space-y-4">
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
-                  ÖTZI engineers social-first media assets and cinematic brand productions. Every format is built to command attention across dynamic feeds through aggressive contrast, monolithic typography, and disciplined craft.
+                  ÖTZI creates social-first content and cinematic brand productions designed to give brands a distinct presence across digital platforms. From individual assets to complete campaign suites, every piece is shaped by strategy, craft, and clear creative direction.
                 </p>
                 <p className="font-body-sm text-body-sm text-paper-dim leading-relaxed max-w-2xl m-0">
-                  Select a production below to inspect the format breakdown, creative direction, and multi-channel asset sequence.
+                  Explore the work below to see the formats and platforms behind each production.
                 </p>
               </div>
 
@@ -67,19 +67,19 @@ export default async function WorkIndexPage() {
                 <div className="grid grid-cols-2 gap-2 text-label-mono font-label-mono uppercase">
                   <div className="border border-[#262626] p-2.5 bg-surface-container-low">
                     <span className="text-white block font-bold">9:16 VERTICAL</span>
-                    <span className="text-paper-dim text-[10px]">REELS &amp; KINETIC MOTION</span>
+                    <span className="text-paper-dim text-[10px]">Reels &amp; short-form motion</span>
                   </div>
                   <div className="border border-[#262626] p-2.5 bg-surface-container-low">
                     <span className="text-white block font-bold">4:5 EDITORIAL</span>
-                    <span className="text-paper-dim text-[10px]">CAROUSELS &amp; MONOGRAPHS</span>
+                    <span className="text-paper-dim text-[10px]">Carousels &amp; editorial compositions</span>
                   </div>
                   <div className="border border-[#262626] p-2.5 bg-surface-container-low">
                     <span className="text-white block font-bold">1:1 SQUARE</span>
-                    <span className="text-paper-dim text-[10px]">STILLS &amp; GRID POSTS</span>
+                    <span className="text-paper-dim text-[10px]">Still imagery &amp; grid content</span>
                   </div>
                   <div className="border border-[#262626] p-2.5 bg-surface-container-low">
                     <span className="text-white block font-bold">16:9 WIDE</span>
-                    <span className="text-paper-dim text-[10px]">CINEMATIC &amp; BROADCAST</span>
+                    <span className="text-paper-dim text-[10px]">Cinematic &amp; long-form video</span>
                   </div>
                 </div>
               </div>
@@ -96,18 +96,15 @@ export default async function WorkIndexPage() {
         aria-label="All Work Productions"
       >
         <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 space-y-16">
-          {/* Section Subhead & Count */}
+          {/* Section Subhead */}
           <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#262626] pb-6 gap-4">
             <div>
-              <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary block mb-1 font-bold">
-                REPERTOIRE
-              </span>
-              <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-                FEATURED WORK ARCHIVE
+              <h2 className="font-display-sm text-display-sm uppercase tracking-tight text-white m-0 font-bold">
+                FEATURED WORK
               </h2>
-            </div>
-            <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim">
-              TOTAL PRODUCTIONS: {allProjects.length.toString().padStart(2, "0")}
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold mt-1">
+                A SELECTION OF RECENT PRODUCTIONS.
+              </div>
             </div>
           </div>
 
@@ -150,20 +147,20 @@ export default async function WorkIndexPage() {
       {/* ====================================================================
           3. DIRECT ENGAGEMENT CTA
           ==================================================================== */}
-      <section className="w-full bg-black py-20 md:py-28" aria-label="Commission CTA">
+      <section className="w-full bg-black py-20 md:py-28" aria-label="Start a project">
         <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>BOOK OUR SERVICES</span>
+                <span>START A PROJECT</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                BOOK OUR SERVICES.
+                START A PROJECT.
               </h2>
               <HairlineDivider withRunwayArrow />
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
-                Open for brand commissions, full social ecosystem design, dynamic motion production, and editorial direction.
+                Have a project in mind? Tell us what you&apos;re building and where you want to take it.
               </p>
             </div>
             <div className="lg:col-span-4 flex flex-col items-start lg:items-end justify-end mt-6 lg:mt-0">
@@ -172,7 +169,7 @@ export default async function WorkIndexPage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                BOOK OUR SERVICES
+                START A PROJECT →
               </Button>
             </div>
           </div>

@@ -38,7 +38,9 @@ export function ProjectCard({
       <div className="pt-4 flex flex-col gap-1 border-t border-[#262626] mt-4">
         <div className="flex items-center justify-between text-paper-dim font-label-mono text-label-mono uppercase tracking-widest text-[11px]">
           <span className="flex items-center gap-1.5">
-            <span className="text-paper-dim">CLIENT</span>
+            <span className="text-paper-dim">
+              {project.client === "STUDIO PRODUCTION" ? "PRODUCTION" : "CLIENT"}
+            </span>
             <span className="text-white font-bold">{project.client}</span>
           </span>
           <span className="flex items-center gap-1.5">

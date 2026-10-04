@@ -34,7 +34,7 @@ export function Footer() {
             </div>
             <div className="flex flex-col gap-2 font-label-action text-label-action uppercase">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/otzi_x_si"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-paper-dim hover:text-primary transition-colors inline-flex items-center gap-1.5"
@@ -43,12 +43,12 @@ export function Footer() {
                 <span aria-hidden="true">→</span>
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://x.com/otzimagency"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-paper-dim hover:text-primary transition-colors inline-flex items-center gap-1.5"
               >
-                <span>LINKEDIN</span>
+                <span>X</span>
                 <span aria-hidden="true">→</span>
               </a>
             </div>
@@ -84,7 +84,7 @@ export function Footer() {
         {/* Bottom Legal & Disciplines */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center text-paper-dim font-label-mono text-label-mono uppercase tracking-widest gap-4">
           <div>© 2026 ÖTZI CREATIVE &amp; SOCIAL PRODUCTION. ALL RIGHTS RESERVED.</div>
-          <div>CREATIVE DIRECTION &amp; PRODUCTION</div>
+          <div>SOCIAL MEDIA MANAGEMENT &amp; CREATIVE PRODUCTION.</div>
         </div>
       </div>
 

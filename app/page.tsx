@@ -27,20 +27,23 @@ export default function HomePage() {
 
             {/* Monumental Editorial Headline */}
             <h1 className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none">
-              SOCIAL MEDIA MANAGEMENT
-              <br />
-              &amp; CREATIVE PRODUCTION.
+              WE BUILD BRANDS THAT MOVE.
             </h1>
+
+            {/* Supporting Line */}
+            <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold">
+              SOCIAL MEDIA MANAGEMENT &amp; CREATIVE PRODUCTION.
+            </div>
 
             {/* Asymmetric Split Grid: Description & Capabilities */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 md:pt-12 border-t border-[#262626] items-start">
               <div className="lg:col-span-7 space-y-6">
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
-                  ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.
+                  ÖTZI builds and manages the digital presence brands need to stay visible, relevant, and moving forward — from social strategy and content production to paid campaigns, SEO, and AI-powered systems.
                 </p>
                 <div className="flex flex-wrap gap-4 pt-4">
                   <Button variant="accent" href="/contact">
-                    BOOK OUR SERVICES
+                    START A PROJECT →
                   </Button>
                   <Button variant="secondary" href="/work">
                     EXPLORE WORK
@@ -51,7 +54,7 @@ export default function HomePage() {
               {/* Right Specifications & Discipline Tags */}
               <div className="lg:col-span-5 flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
                 <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold">
-                  CORE DISCIPLINES
+                  OUR EXPERTISE
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {disciplinesData.map((d) => (
@@ -77,12 +80,12 @@ export default function HomePage() {
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#262626] pb-6 gap-4">
             <div>
-              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold mb-2">
-                SELECTED WORK
-              </div>
-              <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-                FEATURED PRODUCTIONS
+              <h2 className="font-display-sm text-display-sm uppercase tracking-tight text-white m-0 font-bold">
+                SELECTED WORK.
               </h2>
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold mt-2">
+                RECENT PRODUCTIONS.
+              </div>
             </div>
             <ArrowLink href="/work" color="white">
               VIEW ALL WORK
@@ -120,10 +123,10 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#262626] pb-6 gap-4">
             <div>
               <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary block mb-2 font-bold">
-                CORE DISCIPLINES
+                EXPERTISE
               </span>
               <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-                SERVICES &amp; CAPABILITIES
+                OUR EXPERTISE.
               </h2>
             </div>
           </div>
@@ -176,14 +179,14 @@ export default function HomePage() {
 
             {/* Monumental Statement */}
             <h2 className="font-headline-lg text-headline-lg uppercase text-white tracking-tight m-0 max-w-5xl leading-none">
-              THE FEED DEMANDS FRICTION, NOT DECORATIVE NOISE.
+              GOOD CONTENT ISN&apos;T ENOUGH. IT NEEDS DIRECTION.
             </h2>
 
             {/* Split Narrative & Studio Focus */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 border-t border-[#262626] items-start">
               <div className="lg:col-span-7 space-y-6">
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
-                  ÖTZI operates at the intersection of editorial authority and social production—treating digital content with craft, structure, and intentional visual direction.
+                  ÖTZI brings strategy, creative production and digital execution into one system — giving brands a clearer direction and a stronger presence across the channels that matter.
                 </p>
                 <div className="pt-4">
                   <ArrowLink href="/about" color="white">
@@ -195,16 +198,16 @@ export default function HomePage() {
               {/* Tenets Grid */}
               <div className="lg:col-span-5 grid grid-cols-1 gap-4 font-label-mono text-label-mono uppercase border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
                 <div className="pb-3 border-b border-[#262626]">
-                  <span className="text-paper-dim block mb-1">DISCIPLINE</span>
-                  <span className="text-white tracking-wider block">SOCIAL MEDIA STRATEGY &amp; CREATIVE PRODUCTION</span>
+                  <span className="text-paper-dim block mb-1">01 // DISCIPLINE</span>
+                  <span className="text-white tracking-wider block font-bold">STRATEGY BEFORE EXECUTION.</span>
                 </div>
                 <div className="pb-3 border-b border-[#262626]">
-                  <span className="text-paper-dim block mb-1">APPROACH</span>
-                  <span className="text-white tracking-wider block">EDITORIAL PRECISION &amp; PLATFORM EXECUTION</span>
+                  <span className="text-paper-dim block mb-1">02 // APPROACH</span>
+                  <span className="text-white tracking-wider block font-bold">CREATIVE WITH PURPOSE.</span>
                 </div>
                 <div>
-                  <span className="text-paper-dim block mb-1">STANDARDS</span>
-                  <span className="text-white tracking-wider block">CONSISTENT QUALITY ACROSS ALL CHANNELS</span>
+                  <span className="text-paper-dim block mb-1">03 // STANDARDS</span>
+                  <span className="text-white tracking-wider block font-bold">CONSISTENCY AT EVERY TOUCHPOINT.</span>
                 </div>
               </div>
             </div>
@@ -221,17 +224,17 @@ export default function HomePage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold flex items-center gap-2">
                 <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-                <span>BOOK OUR SERVICES</span>
+                <span>START A PROJECT</span>
               </div>
               <h2 className="font-headline-lg text-headline-lg text-white uppercase tracking-tight m-0 font-extrabold leading-none">
-                BOOK OUR SERVICES.
+                LET&apos;S BUILD SOMETHING THAT MOVES.
               </h2>
 
               {/* Signature Runway Hairline Arrow */}
               <HairlineDivider withRunwayArrow />
 
               <p className="font-body-lg text-body-lg text-paper-dim max-w-2xl m-0 leading-relaxed">
-                Open for brand commissions, social media strategy, content production, and creative direction.
+                Tell us what you&apos;re building, where you&apos;re stuck, or where you want to go. We&apos;ll take it from there.
               </p>
             </div>
 
@@ -241,7 +244,7 @@ export default function HomePage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                BOOK OUR SERVICES
+                START A PROJECT →
               </Button>
             </div>
           </div>

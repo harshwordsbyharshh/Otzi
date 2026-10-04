@@ -23,7 +23,7 @@ function generateSafeSlug(text: string): string {
 }
 
 const ASSET_TYPES = ["REEL", "CAROUSEL", "POST", "SHORT FILM"];
-const PLATFORMS = ["INSTAGRAM", "TIKTOK", "YOUTUBE", "DIGITAL"];
+const PLATFORMS = ["INSTAGRAM", "X", "YOUTUBE", "DIGITAL"];
 const ASPECT_RATIOS = ["9:16", "4:5", "1:1", "16:9"];
 const DISCIPLINES = [
   "SOCIAL MEDIA MANAGEMENT & MARKETING",

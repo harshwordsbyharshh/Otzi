@@ -5,7 +5,7 @@ import { ArrowLink } from "@/components/ui/ArrowLink";
 
 export const metadata: Metadata = {
   title: "404 — Page Not Found",
-  description: "The requested route does not exist within the ÖTZI digital framework.",
+  description: "The requested page could not be found.",
   robots: {
     index: false,
     follow: false,
@@ -31,7 +31,7 @@ export default function NotFound() {
                 PAGE NOT FOUND.
               </h1>
               <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0 pt-2">
-                The requested URL or resource does not exist within the ÖTZI digital architecture. Verify the path or return to primary navigation.
+                The requested page does not exist. Check the URL or return to the homepage.
               </p>
             </div>
 
@@ -40,7 +40,7 @@ export default function NotFound() {
                 RETURN TO HOMEPAGE
               </Button>
               <ArrowLink href="/work" color="white">
-                EXPLORE WORK INDEX
+                EXPLORE WORK
               </ArrowLink>
             </div>
           </div>

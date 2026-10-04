@@ -79,10 +79,10 @@ export default async function CaseStudyDetailPage({
       <section className="w-full bg-black border-b border-[#262626] py-6" aria-label="Case Study Breadcrumbs">
         <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 flex items-center justify-between">
           <ArrowLink href="/case-studies" direction="left" color="dim">
-            CASE STUDIES ARCHIVE
+            CASE STUDIES
           </ArrowLink>
           <div className="font-label-mono text-label-mono text-paper-dim uppercase tracking-widest hidden sm:block">
-            ANALYSIS BRIEF — {project.assetType}
+            {project.aspectRatio} FORMAT — {project.platform}
           </div>
         </div>
       </section>
@@ -95,7 +95,7 @@ export default async function CaseStudyDetailPage({
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
               <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-              <span>CASE STUDY BRIEF</span>
+              <span>CASE STUDY</span>
             </div>
 
             <h1
@@ -110,7 +110,7 @@ export default async function CaseStudyDetailPage({
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 border-t border-[#262626] pt-8">
             <div className="border border-[#262626] p-4 bg-surface-container-low flex flex-col justify-between">
               <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block border-b border-[#262626] pb-1.5 mb-2">
-                CLIENT
+                {project.client === "STUDIO PRODUCTION" ? "PRODUCTION" : "CLIENT"}
               </span>
               <span className="font-label-action text-white uppercase tracking-wider font-bold block">
                 {project.client}
@@ -180,7 +180,7 @@ export default async function CaseStudyDetailPage({
               className="max-h-[75vh] w-auto mx-auto shadow-none"
             />
             <div className="flex items-center justify-between pt-4 border-t border-[#262626] mt-4 font-label-mono text-label-mono uppercase tracking-widest text-paper-dim">
-              <span>DOCUMENTED PRODUCTION ASSET</span>
+              <span>PRODUCTION ASSET</span>
               <span>{project.aspectRatio} &mdash; {project.assetType}</span>
             </div>
           </div>
@@ -333,23 +333,23 @@ export default async function CaseStudyDetailPage({
       </section>
 
       {/* ====================================================================
-          7. DIRECT ENGAGEMENT CTA STRIP
+          7. START A PROJECT CTA STRIP
           ==================================================================== */}
-      <section className="w-full bg-black py-20" aria-label="Direct Engagement">
+      <section className="w-full bg-black py-20" aria-label="Start a project">
         <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 border border-[#262626] p-8 md:p-12 bg-surface-container-low">
           <div className="space-y-2 max-w-2xl">
             <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold block">
-              COLLABORATION
+              START A PROJECT
             </span>
             <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
-              REQUEST A CAMPAIGN PROPOSAL.
+              START A PROJECT WITH ÖTZI.
             </h2>
             <p className="font-body-md text-body-md text-paper-dim m-0">
-              Open for brand commissions, full social ecosystem design, dynamic motion production, and editorial direction.
+              Tell us what you need and where you want to take it.
             </p>
           </div>
           <Button variant="primary" href="/contact" className="px-8 py-4 text-sm font-bold shrink-0">
-            BOOK OUR SERVICES
+            START A PROJECT →
           </Button>
         </div>
       </section>

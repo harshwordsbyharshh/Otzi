@@ -80,18 +80,18 @@ export default function ContactPage() {
           <div className="flex flex-col gap-6 md:gap-8">
             <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
               <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-              <span>DIRECT ENGAGEMENT</span>
+              <span>START A PROJECT</span>
             </div>
 
             <h1
               id="contact-heading"
               className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none"
             >
-              BOOK OUR SERVICES.
+              LET&apos;S WORK TOGETHER.
             </h1>
 
             <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0 border-t border-[#262626] pt-6">
-              ÖTZI is open for selective brand commissions, ongoing social ecosystem management, dynamic motion infrastructure, and creative production.
+              Tell us what you&apos;re looking to build, improve, or manage. We&apos;ll review your inquiry and get back to you directly.
             </p>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function ContactPage() {
             <div className="lg:col-span-5 space-y-10">
               <div className="space-y-3">
                 <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold block">
-                  PRIMARY EMAIL INQUIRIES
+                  EMAIL
                 </span>
                 <a
                   href="mailto:otzimagency@gmail.com"
@@ -116,18 +116,18 @@ export default function ContactPage() {
                   OTZIMAGENCY@GMAIL.COM
                 </a>
                 <p className="font-body-sm text-body-sm text-paper-dim leading-relaxed m-0 pt-2">
-                  We review brand inquiries and production requests directly. Include project overview, target channels, and estimated timeline.
+                  For direct inquiries, you can also reach us by email.
                 </p>
               </div>
 
               {/* Direct Channels */}
               <div className="border border-[#262626] p-6 bg-surface-container-low space-y-4">
                 <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold block">
-                  NETWORKS &amp; BROADCAST
+                  FOLLOW ÖTZI
                 </span>
                 <div className="space-y-3 font-label-action text-label-action uppercase text-sm">
                   <a
-                    href="https://instagram.com"
+                    href="https://www.instagram.com/otzi_x_si"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between text-white hover:text-primary transition-colors border-b border-[#262626] pb-2 min-h-[44px]"
@@ -136,12 +136,12 @@ export default function ContactPage() {
                     <span aria-hidden="true">→</span>
                   </a>
                   <a
-                    href="https://linkedin.com"
+                    href="https://x.com/otzimagency"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between text-white hover:text-primary transition-colors min-h-[44px]"
                   >
-                    <span>LINKEDIN</span>
+                    <span>X</span>
                     <span aria-hidden="true">→</span>
                   </a>
                 </div>
@@ -157,13 +157,13 @@ export default function ContactPage() {
                     className="py-12 flex flex-col items-start gap-4"
                   >
                     <span className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
-                      INQUIRY RECORDED
+                      INQUIRY RECEIVED
                     </span>
                     <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
                       THANK YOU FOR YOUR INQUIRY.
                     </h2>
                     <p className="font-body-md text-body-md text-paper-dim leading-relaxed max-w-xl m-0">
-                      Your inquiry parameters have been registered on the client interface. For immediate direct correspondence, you may also email us directly at{" "}
+                      We&apos;ll review your inquiry and get back to you directly. For direct inquiries, you can also reach us by email at{" "}
                       <a
                         href="mailto:otzimagency@gmail.com"
                         className="text-white underline hover:text-primary"
@@ -178,7 +178,7 @@ export default function ContactPage() {
                         variant="primary"
                         onClick={handleReset}
                       >
-                        RESET FORM
+                        START ANOTHER INQUIRY
                       </Button>
                     </div>
                   </div>
@@ -186,7 +186,7 @@ export default function ContactPage() {
                   <form onSubmit={handleSubmit} className="space-y-6" noValidate={false}>
                     <div className="border-b border-[#262626] pb-4">
                       <h2 className="font-title-sm text-title-sm uppercase text-white tracking-tight m-0 font-bold">
-                        COMMISSION PARAMETERS
+                        PROJECT DETAILS
                       </h2>
                     </div>
 
@@ -261,10 +261,10 @@ export default function ContactPage() {
                       />
                     </div>
 
-                    {/* Discipline Selection */}
+                    {/* Service Selection */}
                     <div className="space-y-3 pt-2">
                       <span className="font-label-mono text-label-mono uppercase tracking-wider text-paper-dim block">
-                        DISCIPLINES OF INTEREST
+                        SERVICE OF INTEREST
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {disciplines.map((d) => {
@@ -306,8 +306,11 @@ export default function ContactPage() {
                         htmlFor="details"
                         className="font-label-mono text-label-mono uppercase tracking-wider text-paper-dim block"
                       >
-                        PROJECT OVERVIEW &amp; TIMELINE <span className="text-primary">*</span>
+                        PROJECT DETAILS <span className="text-primary">*</span>
                       </label>
+                      <p className="font-body-sm text-xs text-paper-dim m-0">
+                        Tell us a little about your project, what you need, and any relevant timeline.
+                      </p>
                       <textarea
                         id="details"
                         name="details"
@@ -315,7 +318,7 @@ export default function ContactPage() {
                         required
                         value={details}
                         onChange={(e) => setDetails(e.target.value)}
-                        placeholder="OUTLINE OBJECTIVES, TARGET CHANNELS, AND ESTIMATED TIMELINE..."
+                        placeholder="Tell us a little about your project, what you need, and any relevant timeline..."
                         className="w-full bg-black border border-[#6b6b6b] text-white p-4 font-body-md text-body-md placeholder:text-[#555] focus:outline-none focus:border-white transition-colors resize-y"
                       />
                     </div>
@@ -328,11 +331,8 @@ export default function ContactPage() {
                         disabled={isSubmitting}
                         className="w-full sm:w-auto px-8 py-4 text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? "TRANSMITTING..." : "BOOK OUR SERVICES"}
+                        {isSubmitting ? "SENDING..." : "SEND INQUIRY →"}
                       </Button>
-                      <span className="font-label-mono text-[11px] text-paper-dim uppercase tracking-wider">
-                        DIRECT BRAND INQUIRIES
-                      </span>
                     </div>
                   </form>
                 )}
