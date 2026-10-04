@@ -5,9 +5,18 @@ import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "SERVICES — Five Core Disciplines | ÖTZI",
+  title: "SERVICES — Five Core Disciplines",
   description:
     "Explore ÖTZI's five core disciplines: Social Media Management & Marketing, AI Agents, Paid Ad Management, Google Business Profile Management, and SEO Management.",
+  alternates: {
+    canonical: "/services",
+  },
+  openGraph: {
+    title: "SERVICES — Five Core Disciplines | ÖTZI",
+    description:
+      "Explore ÖTZI's five core disciplines: Social Media Management & Marketing, AI Agents, Paid Ad Management, Google Business Profile Management, and SEO Management.",
+    url: "/services",
+  },
 };
 
 export default function ServicesPage() {

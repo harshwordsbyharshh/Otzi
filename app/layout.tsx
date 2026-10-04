@@ -3,6 +3,7 @@ import { Space_Grotesk, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/navigation/Header";
 import { Footer } from "@/components/navigation/Footer";
+import { getSiteUrl } from "@/lib/site";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -16,18 +17,47 @@ const hankenGrotesk = Hanken_Grotesk({
   display: "swap",
 });
 
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
-  title: "ÖTZI — Social Media Management & Creative Production",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "ÖTZI — Social Media Management & Creative Production",
+    template: "%s | ÖTZI",
+  },
   description:
-    "ÖTZI is a premium social media management and creative agency engineered for cultural velocity and cross-platform narrative coherence.",
-  metadataBase: new URL("https://otzi.studio"),
+    "ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "ÖTZI — Social Media Management & Creative Production",
     description:
-      "ÖTZI is a premium social media management and creative agency engineered for cultural velocity and cross-platform narrative coherence.",
+      "ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.",
     siteName: "ÖTZI",
     locale: "en_US",
     type: "website",
+    url: siteUrl,
+  },
+  twitter: {
+    card: "summary",
+    title: "ÖTZI — Social Media Management & Creative Production",
+    description:
+      "ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
   },
 };
 

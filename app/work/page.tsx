@@ -6,9 +6,18 @@ import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "WORK — Selected Productions & Media Suites | ÖTZI",
+  title: "WORK — Selected Productions & Media Suites",
   description:
     "Explore ÖTZI's portfolio of social media management and creative productions spanning vertical reels, editorial carousels, square still assets, and widescreen narrative cuts.",
+  alternates: {
+    canonical: "/work",
+  },
+  openGraph: {
+    title: "WORK — Selected Productions & Media Suites | ÖTZI",
+    description:
+      "Explore ÖTZI's portfolio of social media management and creative productions spanning vertical reels, editorial carousels, square still assets, and widescreen narrative cuts.",
+    url: "/work",
+  },
 };
 
 export default async function WorkIndexPage() {

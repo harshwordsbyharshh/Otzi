@@ -4,9 +4,18 @@ import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "ABOUT — Agency Philosophy & Craft Standards | ÖTZI",
+  title: "ABOUT — Agency Philosophy & Craft Standards",
   description:
     "ÖTZI is a social media management and creative production agency engineered for cultural velocity, disciplined craft, and cross-platform narrative coherence.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "ABOUT — Agency Philosophy & Craft Standards | ÖTZI",
+    description:
+      "ÖTZI is a social media management and creative production agency engineered for cultural velocity, disciplined craft, and cross-platform narrative coherence.",
+    url: "/about",
+  },
 };
 
 export default function AboutPage() {

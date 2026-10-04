@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/Button";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 
 export const metadata: Metadata = {
-  title: "404 — Page Not Found | ÖTZI",
+  title: "404 — Page Not Found",
   description: "The requested route does not exist within the ÖTZI digital framework.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function NotFound() {

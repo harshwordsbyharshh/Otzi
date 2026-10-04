@@ -2,18 +2,20 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { submitLeadAction } from "./actions";
+import { ALLOWED_DISCIPLINES } from "@/types/lead";
 
-const disciplines = [
-  "SOCIAL MEDIA STRATEGY",
-  "CONTENT PRODUCTION",
-  "CREATIVE DIRECTION",
-  "DIGITAL ACTIVATION",
-  "DISTRIBUTION & CADENCE",
-];
+const disciplines = [...ALLOWED_DISCIPLINES];
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
+  const [fullName, setFullName] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [email, setEmail] = useState("");
+  const [details, setDetails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleDisciplineToggle = (item: string) => {
     setSelectedDisciplines((prev) =>
@@ -21,11 +23,48 @@ export default function ContactPage() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleReset = () => {
+    setSubmitted(false);
+    setSelectedDisciplines([]);
+    setFullName("");
+    setOrganization("");
+    setEmail("");
+    setDetails("");
+    setErrorMessage(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // In Phase 2B, backend/email routing is not connected.
-    // Present a clean, accessible confirmation state without simulating a fake server response.
-    setSubmitted(true);
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const result = await submitLeadAction({
+        full_name: fullName,
+        organization: organization || null,
+        email,
+        disciplines: selectedDisciplines,
+        details,
+      });
+
+      if (!result.success) {
+        setErrorMessage(
+          result.error || "Unable to submit your enquiry at this time. Please try again."
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
+      setIsSubmitting(false);
+    } catch {
+      setErrorMessage(
+        "An unexpected transmission failure occurred. Please try again or email us directly."
+      );
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -137,7 +176,7 @@ export default function ContactPage() {
                       <Button
                         type="button"
                         variant="primary"
-                        onClick={() => setSubmitted(false)}
+                        onClick={handleReset}
                       >
                         RESET FORM
                       </Button>
@@ -150,6 +189,17 @@ export default function ContactPage() {
                         COMMISSION PARAMETERS
                       </h2>
                     </div>
+
+                    {/* Accessible Error Banner */}
+                    {errorMessage && (
+                      <div
+                        role="alert"
+                        className="border border-primary bg-[#1f0d14] p-4 flex items-center gap-3 text-white text-sm font-label-mono"
+                      >
+                        <span className="text-primary font-bold" aria-hidden="true">!</span>
+                        <span>{errorMessage}</span>
+                      </div>
+                    )}
 
                     {/* Name & Organization */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -165,6 +215,8 @@ export default function ContactPage() {
                           name="name"
                           type="text"
                           required
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
                           placeholder="YOUR NAME"
                           className="w-full bg-black border border-[#6b6b6b] text-white px-4 py-3 font-body-md text-body-md placeholder:text-[#555] focus:outline-none focus:border-white transition-colors min-h-[44px]"
                         />
@@ -181,6 +233,8 @@ export default function ContactPage() {
                           id="organization"
                           name="organization"
                           type="text"
+                          value={organization}
+                          onChange={(e) => setOrganization(e.target.value)}
                           placeholder="BRAND NAME"
                           className="w-full bg-black border border-[#6b6b6b] text-white px-4 py-3 font-body-md text-body-md placeholder:text-[#555] focus:outline-none focus:border-white transition-colors min-h-[44px]"
                         />
@@ -200,6 +254,8 @@ export default function ContactPage() {
                         name="email"
                         type="email"
                         required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         placeholder="NAME@ORGANIZATION.COM"
                         className="w-full bg-black border border-[#6b6b6b] text-white px-4 py-3 font-body-md text-body-md placeholder:text-[#555] focus:outline-none focus:border-white transition-colors min-h-[44px]"
                       />
@@ -257,6 +313,8 @@ export default function ContactPage() {
                         name="details"
                         rows={5}
                         required
+                        value={details}
+                        onChange={(e) => setDetails(e.target.value)}
                         placeholder="OUTLINE OBJECTIVES, TARGET CHANNELS, AND ESTIMATED TIMELINE..."
                         className="w-full bg-black border border-[#6b6b6b] text-white p-4 font-body-md text-body-md placeholder:text-[#555] focus:outline-none focus:border-white transition-colors resize-y"
                       />
@@ -264,8 +322,13 @@ export default function ContactPage() {
 
                     {/* Submit Button */}
                     <div className="pt-4 border-t border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <Button type="submit" variant="primary" className="w-full sm:w-auto px-8 py-4 text-sm font-bold">
-                        BOOK OUR SERVICES
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={isSubmitting}
+                        className="w-full sm:w-auto px-8 py-4 text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? "TRANSMITTING..." : "BOOK OUR SERVICES"}
                       </Button>
                       <span className="font-label-mono text-[11px] text-paper-dim uppercase tracking-wider">
                         DIRECT BRAND INQUIRIES

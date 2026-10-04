@@ -38,9 +38,16 @@ export default async function AdminDashboardPage() {
     .select("*", { count: "exact", head: true })
     .eq("published", true);
 
+  // New leads count
+  const { count: newLeadsCount } = await supabase
+    .from("leads")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "new");
+
   const totalProjects = totalCount ?? 0;
   const publishedProjects = publishedCount ?? 0;
   const draftProjects = Math.max(0, totalProjects - publishedProjects);
+  const newLeads = newLeadsCount ?? 0;
 
   return (
     <div className="max-w-[1680px] w-full mx-auto px-4 md:px-6 lg:px-10 py-12 md:py-20 flex flex-col gap-12">
@@ -67,22 +74,28 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Production Management Quick Action Section */}
+      {/* Production & Leads Quick Action Section */}
       <div className="border border-[#262626] p-6 md:p-8 bg-surface-container-low flex flex-col gap-6">
         <div className="border-b border-[#262626] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="font-label-mono text-xs uppercase tracking-widest text-primary font-bold block mb-1">
-              PORTFOLIO ARCHIVE MANAGEMENT
+              PORTFOLIO ARCHIVE &amp; CLIENT INQUIRIES
             </span>
             <h2 className="font-headline-md text-headline-md uppercase text-white tracking-tight m-0 font-bold">
               PRODUCTIONS &amp; REPERTOIRE
             </h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link
+              href="/admin/leads"
+              className="border border-white bg-black hover:border-primary text-white font-label-action uppercase tracking-widest text-xs px-6 py-3 font-bold transition-colors text-center"
+            >
+              CLIENT LEADS →
+            </Link>
             <Link
               href="/admin/projects"
-              className="border border-white bg-black hover:border-primary text-white font-label-action uppercase tracking-widest text-xs px-6 py-3 font-bold transition-colors text-center"
+              className="border border-[#262626] hover:border-white text-paper-dim hover:text-white font-label-mono uppercase tracking-wider text-xs px-5 py-3 transition-colors text-center"
             >
               PROJECT ARCHIVE →
             </Link>
@@ -95,8 +108,20 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Project Counters Matrix */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Operational Counters Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link
+            href="/admin/leads"
+            className="border border-[#262626] hover:border-primary p-4 bg-black transition-colors block group"
+          >
+            <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1 group-hover:text-primary transition-colors">
+              NEW LEADS
+            </span>
+            <span className="font-display-lg text-display-lg text-primary font-bold block leading-none">
+              {newLeads}
+            </span>
+          </Link>
+
           <div className="border border-[#262626] p-4 bg-black">
             <span className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider block mb-1">
               TOTAL RECORD ARCHIVE
@@ -162,10 +187,10 @@ export default async function AdminDashboardPage() {
           </span>
           <div>
             <div className="text-white font-bold font-label-action text-sm">
-              PROJECT MANAGEMENT &amp; PUBLISHING
+              PROJECTS &amp; CLIENT ENQUIRIES
             </div>
             <div className="font-label-mono text-[11px] text-paper-dim uppercase tracking-wider mt-1">
-              FULL PRODUCTION CRUD V1
+              CONTACT &amp; LEADS SYSTEM V1
             </div>
           </div>
         </div>
@@ -177,7 +202,7 @@ export default async function AdminDashboardPage() {
           AUTHENTICATED OPERATOR AREA
         </div>
         <p className="font-body-md text-sm text-paper-dim m-0 leading-relaxed">
-          You are authenticated as an authorized studio administrator. Manage productions, publish campaign assets to the public repertoire, and calibrate project specifications.
+          You are authenticated as an authorized studio administrator. Review incoming commission inquiries, update lead pipeline statuses, and manage the production repertoire.
         </p>
       </div>
     </div>

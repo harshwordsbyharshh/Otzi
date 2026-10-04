@@ -28,15 +28,30 @@ export async function generateMetadata({
 
   if (!project) {
     return {
-      title: "Case Study Not Found | ÖTZI",
+      title: "Case Study Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
+  const title = `${project.title} — Case Study Brief`;
+  const description =
+    project.summary ||
+    `Case study brief for ${project.title}, exploring format architecture and campaign delivery across ${project.platform}.`;
+
   return {
-    title: `${project.title} — Case Study Brief | ÖTZI`,
-    description:
-      project.summary ||
-      `Case study brief for ${project.title}, exploring format architecture and campaign delivery across ${project.platform}.`,
+    title,
+    description,
+    alternates: {
+      canonical: `/case-studies/${slug}`,
+    },
+    openGraph: {
+      title: `${title} | ÖTZI`,
+      description,
+      url: `/case-studies/${slug}`,
+    },
   };
 }
 

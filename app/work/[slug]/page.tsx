@@ -29,15 +29,30 @@ export async function generateMetadata({
 
   if (!project) {
     return {
-      title: "Project Not Found | ÖTZI",
+      title: "Project Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
+  const title = `${project.title} — Production Details`;
+  const description =
+    project.summary ||
+    `Explore ${project.title}, an ÖTZI ${project.assetType} production engineered for ${project.platform} in ${project.aspectRatio} format.`;
+
   return {
-    title: `${project.title} — Production Details | ÖTZI`,
-    description:
-      project.summary ||
-      `Explore ${project.title}, an ÖTZI ${project.assetType} production engineered for ${project.platform} in ${project.aspectRatio} format.`,
+    title,
+    description,
+    alternates: {
+      canonical: `/work/${slug}`,
+    },
+    openGraph: {
+      title: `${title} | ÖTZI`,
+      description,
+      url: `/work/${slug}`,
+    },
   };
 }
 

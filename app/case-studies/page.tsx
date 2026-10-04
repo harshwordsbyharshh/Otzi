@@ -6,9 +6,18 @@ import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "CASE STUDIES — Production Briefs & Formats | ÖTZI",
+  title: "CASE STUDIES — Production Briefs & Formats",
   description:
     "Explore ÖTZI case studies detailing creative direction, multi-format media execution, and platform delivery across social media and digital channels.",
+  alternates: {
+    canonical: "/case-studies",
+  },
+  openGraph: {
+    title: "CASE STUDIES — Production Briefs & Formats | ÖTZI",
+    description:
+      "Explore ÖTZI case studies detailing creative direction, multi-format media execution, and platform delivery across social media and digital channels.",
+    url: "/case-studies",
+  },
 };
 
 export default function CaseStudiesPage() {
