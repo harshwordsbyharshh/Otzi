@@ -9,6 +9,8 @@ export interface ProjectMediaItem {
   caption: string;
   aspectRatio: AspectRatio;
   assetType: AssetType;
+  thumbnailUrl?: string;
+  mediaUrl?: string;
 }
 
 export interface SelectedProject {

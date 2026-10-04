@@ -52,13 +52,13 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
   const allProjects = await getPublishedProjects();
   const currentIndex = allProjects.findIndex((p) => p.slug === slug);
   const nextProject =
-    currentIndex !== -1
+    allProjects.length > 0
       ? allProjects[(currentIndex + 1) % allProjects.length]
-      : allProjects[0];
+      : null;
   const prevProject =
-    currentIndex !== -1
+    allProjects.length > 0
       ? allProjects[(currentIndex - 1 + allProjects.length) % allProjects.length]
-      : allProjects[0];
+      : null;
 
   return (
     <div className="flex flex-col w-full bg-black min-h-screen">
@@ -166,6 +166,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               platform={project.platform}
               slidesCount={project.slidesCount}
               title={project.title}
+              thumbnailUrl={project.thumbnailUrl}
+              mediaUrl={project.mediaUrl}
               className="max-h-[75vh] w-auto mx-auto shadow-none"
             />
             <div className="flex items-center justify-between pt-4 border-t border-[#262626] mt-4 font-label-mono text-label-mono uppercase tracking-widest text-paper-dim">
@@ -272,6 +274,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
                     aspectRatio={item.aspectRatio}
                     assetType={item.assetType}
                     title={item.caption}
+                    thumbnailUrl={item.thumbnailUrl}
+                    mediaUrl={item.mediaUrl}
                   />
                   <div className="pt-2 border-t border-[#262626] flex items-center justify-between font-label-mono text-label-mono text-paper-dim uppercase tracking-wider">
                     <span>{item.caption}</span>
@@ -295,9 +299,13 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim">
                 PREVIOUS PRODUCTION
               </span>
-              <ArrowLink href={`/work/${prevProject.slug}`} direction="left" color="white">
-                {prevProject.title}
-              </ArrowLink>
+              {prevProject ? (
+                <ArrowLink href={`/work/${prevProject.slug}`} direction="left" color="white">
+                  {prevProject.title}
+                </ArrowLink>
+              ) : (
+                <span className="font-label-mono text-xs text-[#555] uppercase">&mdash;</span>
+              )}
             </div>
 
             {/* Work Index Center Anchor */}
@@ -315,9 +323,13 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
               <span className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim">
                 NEXT PRODUCTION
               </span>
-              <ArrowLink href={`/work/${nextProject.slug}`} direction="right" color="white">
-                {nextProject.title}
-              </ArrowLink>
+              {nextProject ? (
+                <ArrowLink href={`/work/${nextProject.slug}`} direction="right" color="white">
+                  {nextProject.title}
+                </ArrowLink>
+              ) : (
+                <span className="font-label-mono text-xs text-[#555] uppercase">&mdash;</span>
+              )}
             </div>
           </div>
         </div>

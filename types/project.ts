@@ -33,3 +33,16 @@ export type ProjectInput = {
 };
 
 export type ProjectFilterStatus = "all" | "published" | "draft";
+
+export type MediaType = "image" | "video";
+
+export interface MediaRecord {
+  id: string;
+  project_id: string;
+  type: MediaType;
+  storage_path: string;
+  alt_text: string | null;
+  sort_order: number;
+  created_at?: string;
+  signedUrl?: string | null;
+}

@@ -1,9 +1,15 @@
 import { createClient } from "./server";
-import { SelectedProject, AssetType, AspectRatio, PlatformType } from "@/types/homepage";
+import { SelectedProject, AssetType, AspectRatio, PlatformType, ProjectMediaItem } from "@/types/homepage";
 import { getAllProjects, getProjectBySlug } from "@/lib/data/homepage";
-import { ProjectRecord } from "@/types/project";
+import { ProjectRecord, MediaRecord } from "@/types/project";
+import { createMediaSignedUrl } from "./media";
 
 function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
+  const isDirectUrl =
+    p.cover_path?.startsWith("http://") ||
+    p.cover_path?.startsWith("https://") ||
+    p.cover_path?.startsWith("/");
+
   return {
     id: p.id,
     slug: p.slug,
@@ -19,8 +25,8 @@ function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
     context: p.description || undefined,
     execution: undefined,
     deliverables: [],
-    thumbnailUrl: p.cover_path || undefined,
-    mediaUrl: p.cover_path || undefined,
+    thumbnailUrl: isDirectUrl ? p.cover_path! : undefined,
+    mediaUrl: isDirectUrl ? p.cover_path! : undefined,
   };
 }
 
@@ -37,7 +43,45 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
       return getAllProjects();
     }
 
-    const dbMapped = (data as ProjectRecord[]).map(mapDbProjectToSelectedProject);
+    const projects = data as ProjectRecord[];
+    const dbMapped: SelectedProject[] = await Promise.all(
+      projects.map(async (p) => {
+        const item = mapDbProjectToSelectedProject(p);
+        if (p.cover_path) {
+          const signedUrl = await createMediaSignedUrl(supabase, p.cover_path, 3600);
+          if (signedUrl) {
+            item.thumbnailUrl = signedUrl;
+            item.mediaUrl = signedUrl;
+          }
+        }
+
+        // Fallback: If no cover URL resolved, query the first attached media item
+        if (!item.thumbnailUrl) {
+          const { data: firstMedia } = await supabase
+            .from("media")
+            .select("storage_path")
+            .eq("project_id", p.id)
+            .order("sort_order", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
+          if (firstMedia?.storage_path) {
+            const fallbackSignedUrl = await createMediaSignedUrl(
+              supabase,
+              firstMedia.storage_path,
+              3600
+            );
+            if (fallbackSignedUrl) {
+              item.thumbnailUrl = fallbackSignedUrl;
+              item.mediaUrl = fallbackSignedUrl;
+            }
+          }
+        }
+
+        return item;
+      })
+    );
+
     return dbMapped;
   } catch {
     return getAllProjects();
@@ -53,14 +97,63 @@ export async function getPublishedProjectBySlug(
       .from("projects")
       .select("*")
       .eq("slug", slug)
-      .eq("published", true)
       .maybeSingle();
 
     if (error || !data) {
       return getProjectBySlug(slug);
     }
 
-    return mapDbProjectToSelectedProject(data as ProjectRecord);
+    const p = data as ProjectRecord;
+
+    // Strict security constraint: unpublished drafts in Supabase must remain hidden
+    if (!p.published) {
+      return undefined;
+    }
+
+    const mapped = mapDbProjectToSelectedProject(p);
+
+    // Resolve cover signed URL if present
+    if (p.cover_path) {
+      const coverSigned = await createMediaSignedUrl(supabase, p.cover_path, 3600);
+      if (coverSigned) {
+        mapped.thumbnailUrl = coverSigned;
+        mapped.mediaUrl = coverSigned;
+      }
+    }
+
+    // Fetch attached published media items
+    const { data: mediaRows } = await supabase
+      .from("media")
+      .select("*")
+      .eq("project_id", p.id)
+      .order("sort_order", { ascending: true });
+
+    if (mediaRows && mediaRows.length > 0) {
+      const typedMedia = mediaRows as MediaRecord[];
+      const mediaSequence: ProjectMediaItem[] = await Promise.all(
+        typedMedia.map(async (m) => {
+          const signed = await createMediaSignedUrl(supabase, m.storage_path, 3600);
+          return {
+            id: m.id,
+            caption: m.alt_text || p.title,
+            aspectRatio: (p.aspect_ratio as AspectRatio) || "9:16",
+            assetType: m.type === "video" ? ("REEL" as AssetType) : ("POST" as AssetType),
+            thumbnailUrl: signed || undefined,
+            mediaUrl: signed || undefined,
+          };
+        })
+      );
+
+      mapped.mediaSequence = mediaSequence;
+
+      // If no explicit cover was resolved, fallback to the first media item
+      if (!mapped.thumbnailUrl && mediaSequence[0]?.thumbnailUrl) {
+        mapped.thumbnailUrl = mediaSequence[0].thumbnailUrl;
+        mapped.mediaUrl = mediaSequence[0].mediaUrl;
+      }
+    }
+
+    return mapped;
   } catch {
     return getProjectBySlug(slug);
   }

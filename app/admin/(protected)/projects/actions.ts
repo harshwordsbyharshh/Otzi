@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { ProjectInput, ProjectRecord } from "@/types/project";
 
-async function verifyAdminAuth() {
+export async function verifyAdminAuth() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -201,6 +201,25 @@ export async function deleteProjectAction(
   try {
     const { supabase } = await verifyAdminAuth();
 
+    // 1. Fetch any attached media records to purge storage files
+    const { data: mediaItems } = await supabase
+      .from("media")
+      .select("storage_path")
+      .eq("project_id", id);
+
+    if (mediaItems && mediaItems.length > 0) {
+      const storagePaths = mediaItems
+        .map((m) => m.storage_path)
+        .filter(Boolean);
+
+      if (storagePaths.length > 0) {
+        await supabase.storage.from("otzi-media").remove(storagePaths);
+      }
+
+      await supabase.from("media").delete().eq("project_id", id);
+    }
+
+    // 2. Delete project record
     const { error } = await supabase
       .from("projects")
       .delete()

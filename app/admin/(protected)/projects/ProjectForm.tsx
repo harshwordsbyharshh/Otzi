@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProjectRecord, ProjectInput } from "@/types/project";
 import { createProjectAction, updateProjectAction, deleteProjectAction } from "./actions";
 import { Button } from "@/components/ui/Button";
+import { ProjectMediaManager } from "@/components/media/ProjectMediaManager";
 
 interface ProjectFormProps {
   project?: ProjectRecord;
@@ -57,6 +58,8 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -152,7 +155,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-10 max-w-5xl">
+    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-10 max-w-5xl">
       {/* Status Messages */}
       {errorMessage && (
         <div
@@ -375,12 +378,12 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
         </div>
       </div>
 
-      {/* Narrative & Media Path Section */}
+      {/* Narrative Section */}
       <div className="border border-[#262626] p-6 md:p-8 bg-surface-container-low flex flex-col gap-6">
         <div className="border-b border-[#262626] pb-4">
           <div className="flex items-center gap-2 font-label-mono text-xs uppercase tracking-widest text-primary font-bold">
             <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-            <span>03. EDITORIAL NARRATIVE &amp; MEDIA ASSET</span>
+            <span>03. EDITORIAL NARRATIVE &amp; BRIEF</span>
           </div>
         </div>
 
@@ -400,37 +403,27 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             className="w-full bg-black border border-[#262626] focus:border-white focus:outline-none p-4 text-white font-body-md text-sm placeholder:text-[#555] transition-colors resize-y leading-relaxed"
           />
         </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="project-cover-path"
-              className="font-label-mono text-xs text-paper-dim uppercase tracking-wider"
-            >
-              COVER ASSET PATH (PRIVATE BUCKET: otzi-media)
-            </label>
-            <span className="font-label-mono text-[10px] text-paper-dim uppercase">OPTIONAL</span>
-          </div>
-          <input
-            id="project-cover-path"
-            type="text"
-            value={coverPath}
-            onChange={(e) => setCoverPath(e.target.value)}
-            placeholder="e.g. projects/case-study-01/cover.jpg or /projects/hero-01.png"
-            className="w-full bg-black border border-[#262626] focus:border-white focus:outline-none px-4 py-3 text-white font-label-mono text-xs placeholder:text-[#555] transition-colors"
-          />
-          <p className="font-label-mono text-[10px] text-paper-dim uppercase tracking-wider m-0">
-            Reference relative path within the private otzi-media Supabase storage bucket or relative public path.
-          </p>
-        </div>
       </div>
+
+      {/* Media Management Suite & Active Cover */}
+      <ProjectMediaManager
+        projectId={project?.id}
+        currentCoverPath={coverPath}
+        onCoverChange={(newCover) => setCoverPath(newCover || "")}
+        isCreateMode={mode === "create"}
+        onInitializeProject={() => {
+          if (formRef.current) {
+            formRef.current.requestSubmit();
+          }
+        }}
+      />
 
       {/* Publishing Status & Action Controls */}
       <div className="border border-[#262626] p-6 md:p-8 bg-surface-container-low flex flex-col gap-6">
         <div className="border-b border-[#262626] pb-4">
           <div className="flex items-center gap-2 font-label-mono text-xs uppercase tracking-widest text-primary font-bold">
             <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
-            <span>04. PUBLISHING STATE &amp; CONTROLS</span>
+            <span>05. PUBLISHING STATE &amp; CONTROLS</span>
           </div>
         </div>
 
