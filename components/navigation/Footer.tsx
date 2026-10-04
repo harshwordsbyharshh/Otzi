@@ -15,20 +15,20 @@ export function Footer() {
         {/* Top Split Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 border-b border-[#262626] pb-12 mb-12">
           {/* Inquiries */}
-          <div className="md:col-span-4 flex flex-col justify-between space-y-4">
+          <div className="md:col-span-12 xl:col-span-6 flex flex-col justify-between space-y-4">
             <div className="font-label-mono text-label-mono text-paper-dim uppercase tracking-widest font-bold">
               INQUIRIES
             </div>
             <a
               href="mailto:otzimagency@gmail.com"
-              className="font-headline-md text-headline-md uppercase text-white hover:text-primary transition-colors font-bold tracking-tight inline-block"
+              className="font-headline-md text-headline-md uppercase text-white hover:text-primary transition-colors font-bold tracking-tight inline-block break-words md:break-normal"
             >
               OTZIMAGENCY@GMAIL.COM
             </a>
           </div>
 
           {/* Networks */}
-          <div className="md:col-span-4 flex flex-col justify-between space-y-4">
+          <div className="md:col-span-6 xl:col-span-3 flex flex-col justify-between space-y-4">
             <div className="font-label-mono text-label-mono text-paper-dim uppercase tracking-widest font-bold">
               NETWORKS
             </div>
@@ -55,7 +55,7 @@ export function Footer() {
           </div>
 
           {/* Back to top & Studio info */}
-          <div className="md:col-span-4 flex flex-col justify-between items-start md:items-end space-y-4">
+          <div className="md:col-span-6 xl:col-span-3 flex flex-col justify-between items-start md:items-end space-y-4">
             <button
               type="button"
               onClick={scrollToTop}
