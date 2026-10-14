@@ -37,6 +37,30 @@ export interface ValidationResult {
   valid: boolean;
   error?: string;
   mediaType?: MediaType;
+  resolvedMime?: string;
+}
+
+/**
+ * Resolves or infers a canonical MIME type from filename extension if the browser
+ * provided an empty, generic, or parameter-laden MIME string.
+ */
+export function resolveMimeType(fileName: string, providedMime?: string): string {
+  const normalized = (providedMime || "").toLowerCase().split(";")[0].trim();
+  if (normalized && normalized !== "application/octet-stream") {
+    return normalized;
+  }
+
+  const lastDot = fileName.lastIndexOf(".");
+  if (lastDot !== -1) {
+    const ext = fileName.slice(lastDot).toLowerCase();
+    if (ext === ".mp4") return "video/mp4";
+    if (ext === ".webm") return "video/webm";
+    if (ext === ".jpg" || ext === ".jpeg") return "image/jpeg";
+    if (ext === ".png") return "image/png";
+    if (ext === ".webp") return "image/webp";
+  }
+
+  return normalized || "application/octet-stream";
 }
 
 /**
@@ -62,25 +86,33 @@ export function validateMediaUpload(file: {
   }
 
   const ext = file.name.slice(lastDot).toLowerCase();
-  const normalizedMime = (file.type || "").toLowerCase().trim();
+  const allowedExts = Object.keys(EXTENSION_MIME_MAP);
+  if (!allowedExts.includes(ext)) {
+    return {
+      valid: false,
+      error: `Unsupported file extension "${ext}". Allowed formats: JPEG, PNG, WebP images and MP4, WebM videos.`,
+    };
+  }
+
+  const resolvedMime = resolveMimeType(file.name, file.type);
 
   // 2. Validate MIME type
-  const isImage = (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(normalizedMime);
-  const isVideo = (ALLOWED_VIDEO_MIME_TYPES as readonly string[]).includes(normalizedMime);
+  const isImage = (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(resolvedMime);
+  const isVideo = (ALLOWED_VIDEO_MIME_TYPES as readonly string[]).includes(resolvedMime);
 
   if (!isImage && !isVideo) {
     return {
       valid: false,
-      error: `Unsupported file format (${normalizedMime || "unknown"}). Allowed formats: JPEG, PNG, WebP images and MP4, WebM videos.`,
+      error: `Unsupported file format (${resolvedMime || "unknown"}). Allowed formats: JPEG, PNG, WebP images and MP4, WebM videos.`,
     };
   }
 
   // 3. Validate extension matches MIME type
   const allowedMimesForExt = EXTENSION_MIME_MAP[ext];
-  if (!allowedMimesForExt || !allowedMimesForExt.includes(normalizedMime)) {
+  if (!allowedMimesForExt || !allowedMimesForExt.includes(resolvedMime)) {
     return {
       valid: false,
-      error: `File extension "${ext}" does not match file type "${normalizedMime}".`,
+      error: `File extension "${ext}" does not match file type "${resolvedMime}".`,
     };
   }
 
@@ -104,6 +136,7 @@ export function validateMediaUpload(file: {
   return {
     valid: true,
     mediaType: isVideo ? "video" : "image",
+    resolvedMime,
   };
 }
 

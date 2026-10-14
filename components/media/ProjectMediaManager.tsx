@@ -4,11 +4,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { MediaRecord } from "@/types/project";
 import {
   getProjectMediaAction,
+  prepareMediaUploadAction,
+  completeMediaUploadAction,
   uploadProjectMediaAction,
   deleteProjectMediaAction,
   setProjectCoverAction,
 } from "@/app/admin/(protected)/projects/mediaActions";
-import { validateMediaUpload } from "@/lib/supabase/media";
+import { validateMediaUpload, STORAGE_BUCKET } from "@/lib/supabase/media";
+import { createClient } from "@/lib/supabase/client";
 
 interface ProjectMediaManagerProps {
   projectId?: string;
@@ -114,35 +117,114 @@ export function ProjectMediaManager({
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("projectId", projectId);
-      formData.append("altText", altText.trim());
-      formData.append("isCover", asCover ? "true" : "false");
+      // Step 1: Request signed upload authorization from server
+      const prepRes = await prepareMediaUploadAction({
+        projectId,
+        fileName: selectedFile.name,
+        fileType: selectedFile.type,
+        fileSize: selectedFile.size,
+      });
 
-      const res = await uploadProjectMediaAction(formData);
+      if (prepRes.success && prepRes.storagePath && prepRes.token) {
+        // Direct browser upload to Supabase Storage - completely bypasses Vercel 4.5MB payload limit!
+        const supabase = createClient();
+        const uploadResult = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .uploadToSignedUrl(prepRes.storagePath, prepRes.token, selectedFile, {
+            contentType: prepRes.resolvedMime || selectedFile.type,
+          });
 
-      if (!res.success || !res.media) {
-        setErrorMessage(res.error || "Failed to upload media to storage.");
-        setUploading(false);
+        if (uploadResult.error) {
+          // If uploadToSignedUrl errored, try direct PUT to signedUrl
+          if (prepRes.signedUrl) {
+            const putRes = await fetch(prepRes.signedUrl, {
+              method: "PUT",
+              headers: {
+                "Content-Type":
+                  prepRes.resolvedMime || selectedFile.type || "application/octet-stream",
+              },
+              body: selectedFile,
+            });
+            if (!putRes.ok) {
+              throw new Error(
+                `Storage upload failed: ${putRes.statusText || uploadResult.error.message}`
+              );
+            }
+          } else {
+            throw new Error(`Storage upload failed: ${uploadResult.error.message}`);
+          }
+        }
+
+        // Step 2: Notify server to create the database record
+        const completeRes = await completeMediaUploadAction({
+          projectId,
+          storagePath: prepRes.storagePath,
+          mediaType:
+            prepRes.mediaType || (selectedFile.type.startsWith("video") ? "video" : "image"),
+          altText: altText.trim(),
+          isCover: asCover,
+        });
+
+        if (!completeRes.success || !completeRes.media) {
+          setErrorMessage(completeRes.error || "Failed to save media metadata in database.");
+          setUploading(false);
+          return;
+        }
+
+        const newMedia = completeRes.media;
+        setMediaList((prev) => [...prev, newMedia]);
+        setStatusMessage(`Media asset "${selectedFile.name}" uploaded successfully.`);
+
+        if (asCover || !currentCoverPath) {
+          onCoverChange?.(newMedia.storage_path);
+        }
+
+        // Reset file input
+        setSelectedFile(null);
+        setAltText("");
+        setAsCover(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
 
-      const newMedia = res.media;
-      setMediaList((prev) => [...prev, newMedia]);
-      setStatusMessage(`Media asset "${selectedFile.name}" uploaded successfully.`);
+      // Fallback for smaller files (under 4MB) if direct preparation was unavailable
+      if (selectedFile.size <= 4 * 1024 * 1024) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("projectId", projectId);
+        formData.append("altText", altText.trim());
+        formData.append("isCover", asCover ? "true" : "false");
 
-      if (asCover || !currentCoverPath) {
-        onCoverChange?.(newMedia.storage_path);
+        const res = await uploadProjectMediaAction(formData);
+
+        if (!res.success || !res.media) {
+          setErrorMessage(res.error || prepRes.error || "Failed to upload media to storage.");
+          setUploading(false);
+          return;
+        }
+
+        const newMedia = res.media;
+        setMediaList((prev) => [...prev, newMedia]);
+        setStatusMessage(`Media asset "${selectedFile.name}" uploaded successfully.`);
+
+        if (asCover || !currentCoverPath) {
+          onCoverChange?.(newMedia.storage_path);
+        }
+
+        // Reset file input
+        setSelectedFile(null);
+        setAltText("");
+        setAsCover(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      } else {
+        setErrorMessage(
+          prepRes.error || "Direct storage upload could not be prepared for this video."
+        );
       }
-
-      // Reset file input
-      setSelectedFile(null);
-      setAltText("");
-      setAsCover(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch {
-      setErrorMessage("An unexpected network error occurred during upload.");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "An unexpected network error occurred during upload.";
+      setErrorMessage(msg);
     } finally {
       setUploading(false);
     }

@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,18 +28,24 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({
-      password,
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({
+        password,
+      });
 
-    if (error) {
-      setMessage(error.message);
+      if (error) {
+        setMessage(error.message);
+        setLoading(false);
+        return;
+      }
+
+      router.replace("/admin/dashboard");
+      router.refresh();
+    } catch {
+      setMessage("Failed to update access key. Please verify your connection.");
       setLoading(false);
-      return;
     }
-
-    router.replace("/admin/dashboard");
-    router.refresh();
   }
 
   return (

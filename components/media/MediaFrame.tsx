@@ -97,9 +97,9 @@ export function MediaFrame({
         <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-[#262626]" />
         <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-[#262626]" />
 
-        {/* Action button trigger */}
-        <div className="bg-black/90 border border-[#262626] px-4 py-2 flex items-center gap-2 text-white font-label-action text-label-action tracking-widest uppercase group-hover:bg-primary group-hover:border-primary transition-colors">
-          {(assetType === "REEL" || assetType === "SHORT FILM" || isVideo) && (
+        {/* Play indicator trigger - strictly for playable motion/video formats */}
+        {(isVideo || assetType === "REEL" || assetType === "SHORT FILM") && (
+          <div className="bg-black/90 border border-[#262626] px-4 py-2 flex items-center gap-2 text-white font-label-action text-label-action tracking-widest uppercase group-hover:bg-primary group-hover:border-primary transition-colors">
             <svg
               width="14"
               height="14"
@@ -109,17 +109,11 @@ export function MediaFrame({
             >
               <path d="M3 2L12 7L3 12V2Z" />
             </svg>
-          )}
-          <span>
-            {assetType === "REEL" || isVideo
-              ? "PLAY REEL"
-              : assetType === "SHORT FILM"
-              ? "PLAY FILM"
-              : assetType === "CAROUSEL"
-              ? "VIEW CAROUSEL"
-              : "EXPLORE STILL"}
-          </span>
-        </div>
+            <span>
+              {assetType === "SHORT FILM" ? "PLAY FILM" : "PLAY REEL"}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Bottom Subtle Platform / Type indicator */}

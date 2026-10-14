@@ -46,6 +46,174 @@ export async function getProjectMediaAction(
   }
 }
 
+/**
+ * Authorizes and prepares direct-to-storage signed upload URL for browser uploads.
+ * This completely bypasses Vercel/Serverless payload limits (4.5MB) for videos up to 50MB.
+ */
+export async function prepareMediaUploadAction(input: {
+  projectId: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+}): Promise<{
+  success: boolean;
+  storagePath?: string;
+  token?: string;
+  signedUrl?: string;
+  mediaType?: "image" | "video";
+  resolvedMime?: string;
+  error?: string;
+}> {
+  try {
+    const { supabase } = await verifyAdminAuth();
+    const { projectId, fileName, fileType, fileSize } = input;
+
+    if (!projectId) {
+      return { success: false, error: "Missing project ID specification." };
+    }
+
+    // 1. Validate file (MIME type, extension, size limits)
+    const validation = validateMediaUpload({
+      name: fileName,
+      type: fileType,
+      size: fileSize,
+    });
+
+    if (!validation.valid || !validation.mediaType) {
+      return { success: false, error: validation.error || "File validation failed." };
+    }
+
+    // 2. Verify project exists
+    const { data: project, error: projError } = await supabase
+      .from("projects")
+      .select("id")
+      .eq("id", projectId)
+      .single();
+
+    if (projError || !project) {
+      return { success: false, error: "Target project does not exist in the archive." };
+    }
+
+    // 3. Generate collision-safe storage path
+    const storagePath = generateSafeStoragePath(projectId, fileName);
+
+    // 4. Create signed upload URL in Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUploadUrl(storagePath);
+
+    if (uploadError || !uploadData) {
+      return {
+        success: false,
+        error: `Storage upload authorization rejected: ${uploadError?.message || "Unknown error"}`,
+      };
+    }
+
+    return {
+      success: true,
+      storagePath,
+      token: uploadData.token,
+      signedUrl: uploadData.signedUrl,
+      mediaType: validation.mediaType,
+      resolvedMime: validation.resolvedMime,
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to prepare storage upload.";
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Records media metadata into public.media after direct-to-storage upload completes.
+ */
+export async function completeMediaUploadAction(input: {
+  projectId: string;
+  storagePath: string;
+  mediaType: "image" | "video";
+  altText?: string;
+  isCover?: boolean;
+}): Promise<{ success: boolean; media?: MediaRecord; error?: string }> {
+  try {
+    const { supabase } = await verifyAdminAuth();
+    const { projectId, storagePath, mediaType, altText = "", isCover = false } = input;
+
+    if (!projectId || !storagePath) {
+      return { success: false, error: "Missing required upload metadata." };
+    }
+
+    // 1. Verify project exists
+    const { data: project, error: projError } = await supabase
+      .from("projects")
+      .select("id, slug, cover_path")
+      .eq("id", projectId)
+      .single();
+
+    if (projError || !project) {
+      return { success: false, error: "Target project does not exist in the archive." };
+    }
+
+    // 2. Calculate next sort order
+    const { count } = await supabase
+      .from("media")
+      .select("*", { count: "exact", head: true })
+      .eq("project_id", projectId);
+
+    const sortOrder = (count ?? 0) + 1;
+
+    // 3. Insert metadata into public.media
+    const { data: mediaRow, error: insertError } = await supabase
+      .from("media")
+      .insert({
+        project_id: projectId,
+        type: mediaType,
+        storage_path: storagePath,
+        alt_text: altText.trim() || null,
+        sort_order: sortOrder,
+      })
+      .select()
+      .single();
+
+    if (insertError || !mediaRow) {
+      // Revert storage upload to prevent orphaned storage objects
+      await supabase.storage.from(STORAGE_BUCKET).remove([storagePath]);
+      return {
+        success: false,
+        error: `Database metadata write failed: ${insertError?.message || "Unknown error"}`,
+      };
+    }
+
+    // 4. Handle project cover update
+    if (isCover || !project.cover_path) {
+      await supabase
+        .from("projects")
+        .update({
+          cover_path: storagePath,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", projectId);
+    }
+
+    // 5. Generate signed URL for immediate client preview
+    const signedUrl = await createMediaSignedUrl(supabase, storagePath, 3600);
+    const mediaWithSignedUrl: MediaRecord = {
+      ...(mediaRow as MediaRecord),
+      signedUrl,
+    };
+
+    revalidatePath("/admin/projects");
+    revalidatePath(`/admin/projects/${projectId}/edit`);
+    revalidatePath("/work");
+    if (project.slug) {
+      revalidatePath(`/work/${project.slug}`);
+    }
+
+    return { success: true, media: mediaWithSignedUrl };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to record uploaded media.";
+    return { success: false, error: message };
+  }
+}
+
 export async function uploadProjectMediaAction(
   formData: FormData
 ): Promise<{ success: boolean; media?: MediaRecord; error?: string }> {
@@ -97,7 +265,7 @@ export async function uploadProjectMediaAction(
     const { error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(storagePath, fileBuffer, {
-        contentType: file.type,
+        contentType: validation.resolvedMime || file.type,
         upsert: false,
       });
 
