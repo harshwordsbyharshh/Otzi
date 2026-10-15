@@ -86,6 +86,7 @@ export async function createProjectAction(
     revalidatePath("/admin/projects");
     revalidatePath("/admin/dashboard");
     revalidatePath("/work");
+    revalidatePath("/");
 
     return { success: true, project: data as ProjectRecord };
   } catch (err: unknown) {
@@ -157,6 +158,7 @@ export async function updateProjectAction(
     revalidatePath(`/admin/projects/${id}/edit`);
     revalidatePath("/work");
     revalidatePath(`/work/${slug}`);
+    revalidatePath("/");
 
     return { success: true, project: data as ProjectRecord };
   } catch (err: unknown) {
@@ -187,6 +189,7 @@ export async function togglePublishAction(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${id}/edit`);
     revalidatePath("/work");
+    revalidatePath("/");
 
     return { success: true };
   } catch (err: unknown) {
@@ -232,6 +235,7 @@ export async function deleteProjectAction(
     revalidatePath("/admin/projects");
     revalidatePath("/admin/dashboard");
     revalidatePath("/work");
+    revalidatePath("/");
 
     return { success: true };
   } catch (err: unknown) {

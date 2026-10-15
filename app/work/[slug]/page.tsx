@@ -2,7 +2,6 @@ import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllProjects } from "@/lib/data/homepage";
 import { getPublishedProjects, getPublishedProjectBySlug } from "@/lib/supabase/projects";
 import { MediaFrame } from "@/components/media/MediaFrame";
 import { ArrowLink } from "@/components/ui/ArrowLink";
@@ -15,10 +14,14 @@ interface WorkDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  const projects = getAllProjects();
-  return projects.map((p) => ({
-    slug: p.slug,
-  }));
+  try {
+    const projects = await getPublishedProjects();
+    return (projects || []).map((p) => ({
+      slug: p.slug,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

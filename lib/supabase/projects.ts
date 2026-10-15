@@ -1,6 +1,5 @@
-import { createClient } from "./server";
+import { createServiceRoleClient, createPublicClient } from "./server";
 import { SelectedProject, AssetType, AspectRatio, PlatformType, ProjectMediaItem } from "@/types/homepage";
-import { getAllProjects, getProjectBySlug } from "@/lib/data/homepage";
 import { ProjectRecord, MediaRecord } from "@/types/project";
 import { createMediaSignedUrl } from "./media";
 
@@ -35,15 +34,27 @@ function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
 
 export async function getPublishedProjects(): Promise<SelectedProject[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
+    if (!supabase) {
+      return [];
+    }
+
+    const serviceClient = createServiceRoleClient();
+    const storageClient = serviceClient || supabase;
+
     const { data, error } = await supabase
       .from("projects")
       .select("*")
       .eq("published", true)
       .order("created_at", { ascending: false });
 
-    if (error || !data || data.length === 0) {
-      return getAllProjects();
+    if (error) {
+      console.error("[getPublishedProjects] Supabase error:", error.message);
+      return [];
+    }
+
+    if (!data || data.length === 0) {
+      return [];
     }
 
     // Exclude any temporary or AI-generated test productions from public presentation
@@ -52,14 +63,28 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
     );
 
     if (validProjects.length === 0) {
-      return getAllProjects();
+      return [];
     }
 
-    const dbMapped: SelectedProject[] = await Promise.all(
-      validProjects.map(async (p) => {
+    // Defensive deduplication by project id and slug to guarantee unique cards
+    const seenIds = new Set<string>();
+    const seenSlugs = new Set<string>();
+    const distinctProjects: ProjectRecord[] = [];
+
+    for (const p of validProjects) {
+      if (seenIds.has(p.id) || seenSlugs.has(p.slug)) {
+        continue;
+      }
+      seenIds.add(p.id);
+      seenSlugs.add(p.slug);
+      distinctProjects.push(p);
+    }
+
+    const dbMapped: (SelectedProject | null)[] = await Promise.all(
+      distinctProjects.map(async (p) => {
         const item = mapDbProjectToSelectedProject(p);
         if (p.cover_path) {
-          const signedUrl = await createMediaSignedUrl(supabase, p.cover_path, 3600);
+          const signedUrl = await createMediaSignedUrl(storageClient, p.cover_path, 3600);
           if (signedUrl) {
             item.thumbnailUrl = signedUrl;
             item.mediaUrl = signedUrl;
@@ -78,7 +103,7 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
 
           if (firstMedia?.storage_path) {
             const fallbackSignedUrl = await createMediaSignedUrl(
-              supabase,
+              storageClient,
               firstMedia.storage_path,
               3600
             );
@@ -89,13 +114,24 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
           }
         }
 
+        // Case F: A project record exists but required media is missing.
+        // Exclude from public display with a warning so visitors never see broken cards.
+        if (!item.thumbnailUrl && !item.mediaUrl) {
+          console.warn(
+            `[getPublishedProjects] Project "${p.title}" (${p.slug}) has no media. Excluded from public display.`
+          );
+          return null;
+        }
+
         return item;
       })
     );
 
-    return dbMapped;
-  } catch {
-    return getAllProjects();
+    return dbMapped.filter((p): p is SelectedProject => p !== null);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unexpected fetch error";
+    console.error("[getPublishedProjects] Exception during project retrieval:", message);
+    return [];
   }
 }
 
@@ -103,7 +139,14 @@ export async function getPublishedProjectBySlug(
   slug: string
 ): Promise<SelectedProject | undefined> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
+    if (!supabase) {
+      return undefined;
+    }
+
+    const serviceClient = createServiceRoleClient();
+    const storageClient = serviceClient || supabase;
+
     const { data, error } = await supabase
       .from("projects")
       .select("*")
@@ -111,7 +154,7 @@ export async function getPublishedProjectBySlug(
       .maybeSingle();
 
     if (error || !data) {
-      return getProjectBySlug(slug);
+      return undefined;
     }
 
     const p = data as ProjectRecord;
@@ -125,7 +168,7 @@ export async function getPublishedProjectBySlug(
 
     // Resolve cover signed URL if present
     if (p.cover_path) {
-      const coverSigned = await createMediaSignedUrl(supabase, p.cover_path, 3600);
+      const coverSigned = await createMediaSignedUrl(storageClient, p.cover_path, 3600);
       if (coverSigned) {
         mapped.thumbnailUrl = coverSigned;
         mapped.mediaUrl = coverSigned;
@@ -143,7 +186,7 @@ export async function getPublishedProjectBySlug(
       const typedMedia = mediaRows as MediaRecord[];
       const mediaSequence: ProjectMediaItem[] = await Promise.all(
         typedMedia.map(async (m) => {
-          const signed = await createMediaSignedUrl(supabase, m.storage_path, 3600);
+          const signed = await createMediaSignedUrl(storageClient, m.storage_path, 3600);
           return {
             id: m.id,
             caption: m.alt_text || p.title,
@@ -165,7 +208,10 @@ export async function getPublishedProjectBySlug(
     }
 
     return mapped;
-  } catch {
-    return getProjectBySlug(slug);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unexpected fetch error";
+    console.error(`[getPublishedProjectBySlug] Exception retrieving "${slug}":`, message);
+    return undefined;
   }
 }
+

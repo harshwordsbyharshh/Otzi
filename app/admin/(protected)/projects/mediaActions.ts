@@ -203,6 +203,7 @@ export async function completeMediaUploadAction(input: {
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${projectId}/edit`);
     revalidatePath("/work");
+    revalidatePath("/");
     if (project.slug) {
       revalidatePath(`/work/${project.slug}`);
     }
@@ -328,6 +329,7 @@ export async function uploadProjectMediaAction(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${projectId}/edit`);
     revalidatePath("/work");
+    revalidatePath("/");
     if (project.slug) {
       revalidatePath(`/work/${project.slug}`);
     }
@@ -429,6 +431,7 @@ export async function deleteProjectMediaAction(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${projectId}/edit`);
     revalidatePath("/work");
+    revalidatePath("/");
     if (project?.slug) {
       revalidatePath(`/work/${project.slug}`);
     }
@@ -476,6 +479,7 @@ export async function setProjectCoverAction(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${projectId}/edit`);
     revalidatePath("/work");
+    revalidatePath("/");
     if (project?.slug) {
       revalidatePath(`/work/${project.slug}`);
     }

@@ -23,6 +23,11 @@ export const metadata: Metadata = {
 export default async function WorkIndexPage() {
   const allProjects = await getPublishedProjects();
 
+  // Defensive deduplication by project ID
+  const uniqueProjects = Array.from(
+    new Map((allProjects || []).map((p) => [p.id, p])).values()
+  );
+
   return (
     <div className="flex flex-col w-full bg-black min-h-screen">
       {/* ====================================================================
@@ -108,38 +113,90 @@ export default async function WorkIndexPage() {
             </div>
           </div>
 
-          {/* Primary Asymmetric Cluster: Vertical 9:16 + 4:5 Carousel & 1:1 Still */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-5">
-              {allProjects[0] && <ProjectCard project={allProjects[0]} basePath="work" />}
-            </div>
-            <div className="lg:col-span-7 flex flex-col gap-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                {allProjects[1] && <ProjectCard project={allProjects[1]} basePath="work" />}
-                {allProjects[2] && <ProjectCard project={allProjects[2]} basePath="work" />}
+          {/* Case A: Zero published projects */}
+          {uniqueProjects.length === 0 && (
+            <div className="border border-[#262626] p-12 md:p-16 bg-surface-container-low text-center flex flex-col items-center justify-center gap-3">
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
+                PRODUCTIONS CURRENTLY IN PREPARATION
               </div>
-              {allProjects[3] && <ProjectCard project={allProjects[3]} basePath="work" />}
-            </div>
-          </div>
-
-          {/* Hairline Divider between clusters */}
-          <HairlineDivider />
-
-          {/* Secondary Balanced Grid: Remaining Productions */}
-          {allProjects.length > 4 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-              {allProjects[4] && <ProjectCard project={allProjects[4]} basePath="work" />}
-              {allProjects[5] && <ProjectCard project={allProjects[5]} basePath="work" />}
+              <p className="font-body-md text-paper-dim m-0 max-w-xl leading-relaxed">
+                The public portfolio is currently being curated. Contact the studio for private client credentials, full reels, or multi-format campaign archives.
+              </p>
+              <div className="pt-4">
+                <Button variant="accent" href="/contact">
+                  INQUIRE FOR PRIVATE REPERTOIRE →
+                </Button>
+              </div>
             </div>
           )}
 
-          {/* Additional Productions Grid */}
-          {allProjects.length > 6 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-8 border-t border-[#262626]">
-              {allProjects.slice(6).map((project) => (
-                <ProjectCard key={project.id} project={project} basePath="work" />
-              ))}
+          {/* Case B: Exactly one published project */}
+          {uniqueProjects.length === 1 && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="lg:col-span-5">
+                <ProjectCard project={uniqueProjects[0]} basePath="work" />
+              </div>
             </div>
+          )}
+
+          {/* Case C: Exactly two published projects */}
+          {uniqueProjects.length === 2 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              <ProjectCard project={uniqueProjects[0]} basePath="work" />
+              <ProjectCard project={uniqueProjects[1]} basePath="work" />
+            </div>
+          )}
+
+          {/* Case D: Exactly three published projects */}
+          {uniqueProjects.length === 3 && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="lg:col-span-5">
+                <ProjectCard project={uniqueProjects[0]} basePath="work" />
+              </div>
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <ProjectCard project={uniqueProjects[1]} basePath="work" />
+                <ProjectCard project={uniqueProjects[2]} basePath="work" />
+              </div>
+            </div>
+          )}
+
+          {/* Case E: Four or more published projects */}
+          {uniqueProjects.length >= 4 && (
+            <>
+              {/* Primary Asymmetric Cluster: Vertical 9:16 + 4:5 Carousel & 1:1 Still */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div className="lg:col-span-5">
+                  <ProjectCard project={uniqueProjects[0]} basePath="work" />
+                </div>
+                <div className="lg:col-span-7 flex flex-col gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <ProjectCard project={uniqueProjects[1]} basePath="work" />
+                    <ProjectCard project={uniqueProjects[2]} basePath="work" />
+                  </div>
+                  {uniqueProjects[3] && <ProjectCard project={uniqueProjects[3]} basePath="work" />}
+                </div>
+              </div>
+
+              {/* Hairline Divider between clusters if more than 4 */}
+              {uniqueProjects.length > 4 && <HairlineDivider />}
+
+              {/* Secondary Balanced Grid: Projects 4 & 5 */}
+              {uniqueProjects.length > 4 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                  {uniqueProjects[4] && <ProjectCard project={uniqueProjects[4]} basePath="work" />}
+                  {uniqueProjects[5] && <ProjectCard project={uniqueProjects[5]} basePath="work" />}
+                </div>
+              )}
+
+              {/* Additional Productions Grid: Projects 6+ */}
+              {uniqueProjects.length > 6 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-8 border-t border-[#262626]">
+                  {uniqueProjects.slice(6).map((project) => (
+                    <ProjectCard key={project.id} project={project} basePath="work" />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

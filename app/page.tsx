@@ -3,30 +3,37 @@ import { Button } from "@/components/ui/Button";
 import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 import { ProjectCard } from "@/components/portfolio/ProjectCard";
-import { disciplinesData, selectedProjectsData } from "@/lib/data/homepage";
+import { disciplinesData } from "@/lib/data/homepage";
 import { getPublishedProjects } from "@/lib/supabase/projects";
+import { SelectedProject } from "@/types/homepage";
 
 export default async function HomePage() {
   const publishedProjects = await getPublishedProjects();
-  const allProjects =
-    publishedProjects && publishedProjects.length > 0
-      ? publishedProjects
-      : selectedProjectsData;
 
-  const reelProject =
-    allProjects.find((p) => p.aspectRatio === "9:16") || allProjects[0];
-  const carouselProject =
-    allProjects.find((p) => p.aspectRatio === "4:5") ||
-    allProjects[1] ||
-    allProjects[0];
-  const squareProject =
-    allProjects.find((p) => p.aspectRatio === "1:1") ||
-    allProjects[2] ||
-    allProjects[0];
-  const cinemaProject =
-    allProjects.find((p) => p.aspectRatio === "16:9") ||
-    allProjects[3] ||
-    allProjects[0];
+  // Defensive deduplication by project ID
+  const uniqueProjects = Array.from(
+    new Map((publishedProjects || []).map((p) => [p.id, p])).values()
+  );
+
+  // Select up to 4 distinct projects for the featured grid without repetition
+  const selectedProjects: SelectedProject[] = [];
+  const usedIds = new Set<string>();
+
+  // Priority 1: Vertical 9:16 asset for primary slot if available
+  const verticalProject = uniqueProjects.find((p) => p.aspectRatio === "9:16");
+  if (verticalProject) {
+    selectedProjects.push(verticalProject);
+    usedIds.add(verticalProject.id);
+  }
+
+  // Priority 2: Distinct remaining projects up to 4 slots total
+  for (const p of uniqueProjects) {
+    if (selectedProjects.length >= 4) break;
+    if (!usedIds.has(p.id)) {
+      selectedProjects.push(p);
+      usedIds.add(p.id);
+    }
+  }
 
   return (
     <div className="flex flex-col w-full bg-black flex-1">
@@ -109,25 +116,74 @@ export default async function HomePage() {
             </ArrowLink>
           </div>
 
-          {/* Asymmetric Stitch Layout: 9:16 Column + Right Media Cluster */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* 9:16 Vertical Reel Frame (Col 1-5) */}
-            <div className="lg:col-span-5">
-              <ProjectCard project={reelProject} basePath="work" />
+          {/* Case A: Zero published projects */}
+          {selectedProjects.length === 0 && (
+            <div className="border border-[#262626] p-12 md:p-16 bg-surface-container-low text-center flex flex-col items-center justify-center gap-3">
+              <div className="font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
+                SELECTED PRODUCTIONS IN PREPARATION
+              </div>
+              <p className="font-body-md text-paper-dim m-0 max-w-xl leading-relaxed">
+                The studio repertoire is currently being updated. Inquire directly for specific private credentials, portfolio decks, or multi-format campaign archives.
+              </p>
+              <div className="pt-4">
+                <Button variant="accent" href="/contact">
+                  INQUIRE FOR PRIVATE REPERTOIRE →
+                </Button>
+              </div>
             </div>
+          )}
 
-            {/* Right Cluster (Col 6-12) */}
-            <div className="lg:col-span-7 flex flex-col gap-8">
-              {/* Row of 4:5 Carousel and 1:1 Square Frame */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <ProjectCard project={carouselProject} basePath="work" />
-                <ProjectCard project={squareProject} basePath="work" />
+          {/* Case B: Exactly one published project */}
+          {selectedProjects.length === 1 && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="lg:col-span-5">
+                <ProjectCard project={selectedProjects[0]} basePath="work" />
+              </div>
+            </div>
+          )}
+
+          {/* Case C: Exactly two published projects */}
+          {selectedProjects.length === 2 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              <ProjectCard project={selectedProjects[0]} basePath="work" />
+              <ProjectCard project={selectedProjects[1]} basePath="work" />
+            </div>
+          )}
+
+          {/* Case D: Exactly three published projects */}
+          {selectedProjects.length === 3 && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="lg:col-span-5">
+                <ProjectCard project={selectedProjects[0]} basePath="work" />
+              </div>
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <ProjectCard project={selectedProjects[1]} basePath="work" />
+                <ProjectCard project={selectedProjects[2]} basePath="work" />
+              </div>
+            </div>
+          )}
+
+          {/* Case E: Four or more published projects (Full Stitch Asymmetric Layout) */}
+          {selectedProjects.length >= 4 && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* 9:16 Vertical Reel Frame (Col 1-5) */}
+              <div className="lg:col-span-5">
+                <ProjectCard project={selectedProjects[0]} basePath="work" />
               </div>
 
-              {/* 16:9 Widescreen Cut Frame */}
-              <ProjectCard project={cinemaProject} basePath="work" />
+              {/* Right Cluster (Col 6-12) */}
+              <div className="lg:col-span-7 flex flex-col gap-8">
+                {/* Row of 4:5 Carousel and 1:1 Square Frame */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <ProjectCard project={selectedProjects[1]} basePath="work" />
+                  <ProjectCard project={selectedProjects[2]} basePath="work" />
+                </div>
+
+                {/* 16:9 Widescreen Cut Frame */}
+                <ProjectCard project={selectedProjects[3]} basePath="work" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
