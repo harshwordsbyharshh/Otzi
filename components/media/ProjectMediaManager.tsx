@@ -365,7 +365,7 @@ export function ProjectMediaManager({
             UPLOAD PRODUCTION ASSET
           </span>
           <span className="font-label-mono text-[10px] text-paper-dim uppercase">
-            MAX: 15MB (IMAGE) / 50MB (VIDEO)
+            MAX: 15MB (IMAGE) / 300MB (VIDEO)
           </span>
         </div>
 

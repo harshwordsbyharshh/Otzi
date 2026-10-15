@@ -9,7 +9,7 @@ export const STORAGE_BUCKET = "otzi-media";
 
 // V1 Upload Size Limits
 export const IMAGE_MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
-export const VIDEO_MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
+export const VIDEO_MAX_SIZE_BYTES = 300 * 1024 * 1024; // 300 MB
 
 // Allowed MIME types
 export const ALLOWED_IMAGE_MIME_TYPES = [
@@ -129,7 +129,7 @@ export function validateMediaUpload(file: {
     const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
     return {
       valid: false,
-      error: `Video exceeds the 50MB limit (current: ${sizeMb}MB). Please provide a web cutdown under 50MB.`,
+      error: `Video exceeds the 300MB limit (current: ${sizeMb}MB). Please provide a web cutdown under 300MB.`,
     };
   }
 

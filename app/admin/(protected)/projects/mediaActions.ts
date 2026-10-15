@@ -48,7 +48,7 @@ export async function getProjectMediaAction(
 
 /**
  * Authorizes and prepares direct-to-storage signed upload URL for browser uploads.
- * This completely bypasses Vercel/Serverless payload limits (4.5MB) for videos up to 50MB.
+ * This completely bypasses Vercel/Serverless payload limits (4.5MB) for videos up to 300MB.
  */
 export async function prepareMediaUploadAction(input: {
   projectId: string;
