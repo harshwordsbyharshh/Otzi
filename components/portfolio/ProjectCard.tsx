@@ -18,21 +18,53 @@ export function ProjectCard({
   if (!project) return null;
   const targetHref = `/${basePath}/${project.slug || ""}`;
 
+  const activeMediaUrl = project.mediaUrl || project.thumbnailUrl;
+  const isVideoFile =
+    Boolean(activeMediaUrl) &&
+    (activeMediaUrl!.toLowerCase().includes(".mp4") ||
+      activeMediaUrl!.toLowerCase().includes(".webm"));
+
+  const isImageExtension =
+    Boolean(activeMediaUrl) &&
+    /\.(jpe?g|png|webp|gif|svg)(\?.*)?$/i.test(activeMediaUrl!);
+
+  const isPlayableVideo =
+    Boolean(activeMediaUrl) &&
+    (isVideoFile ||
+      (!isImageExtension &&
+        (project.assetType === "REEL" || project.assetType === "SHORT FILM")));
+
   return (
     <div
       className={`flex flex-col border border-[#262626] p-4 bg-surface-container-low group hover:border-paper-dim transition-colors ${className}`}
     >
-      {/* Media Well */}
-      <Link href={targetHref} className="block">
-        <MediaFrame
-          aspectRatio={project.aspectRatio}
-          assetType={project.assetType}
-          platform={project.platform}
-          slidesCount={project.slidesCount}
-          thumbnailUrl={project.thumbnailUrl}
-          title={project.title}
-        />
-      </Link>
+      {/* Media Well: For playable videos, allow in-place interactive playback without nested anchor conflicts.
+          For static visual assets, wrap with Next Link to project details. */}
+      {isPlayableVideo ? (
+        <div className="block">
+          <MediaFrame
+            aspectRatio={project.aspectRatio}
+            assetType={project.assetType}
+            platform={project.platform}
+            slidesCount={project.slidesCount}
+            thumbnailUrl={project.thumbnailUrl}
+            mediaUrl={project.mediaUrl}
+            title={project.title}
+          />
+        </div>
+      ) : (
+        <Link href={targetHref} className="block">
+          <MediaFrame
+            aspectRatio={project.aspectRatio}
+            assetType={project.assetType}
+            platform={project.platform}
+            slidesCount={project.slidesCount}
+            thumbnailUrl={project.thumbnailUrl}
+            mediaUrl={project.mediaUrl}
+            title={project.title}
+          />
+        </Link>
+      )}
 
       {/* Metadata & Title Block */}
       <div className="pt-4 flex flex-col gap-1 border-t border-[#262626] mt-4">

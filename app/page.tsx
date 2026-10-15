@@ -4,12 +4,29 @@ import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 import { ProjectCard } from "@/components/portfolio/ProjectCard";
 import { disciplinesData, selectedProjectsData } from "@/lib/data/homepage";
+import { getPublishedProjects } from "@/lib/supabase/projects";
 
-export default function HomePage() {
-  const reelProject = selectedProjectsData.find((p) => p.aspectRatio === "9:16") || selectedProjectsData[0];
-  const carouselProject = selectedProjectsData.find((p) => p.aspectRatio === "4:5") || selectedProjectsData[1] || selectedProjectsData[0];
-  const squareProject = selectedProjectsData.find((p) => p.aspectRatio === "1:1") || selectedProjectsData[2] || selectedProjectsData[0];
-  const cinemaProject = selectedProjectsData.find((p) => p.aspectRatio === "16:9") || selectedProjectsData[3] || selectedProjectsData[0];
+export default async function HomePage() {
+  const publishedProjects = await getPublishedProjects();
+  const allProjects =
+    publishedProjects && publishedProjects.length > 0
+      ? publishedProjects
+      : selectedProjectsData;
+
+  const reelProject =
+    allProjects.find((p) => p.aspectRatio === "9:16") || allProjects[0];
+  const carouselProject =
+    allProjects.find((p) => p.aspectRatio === "4:5") ||
+    allProjects[1] ||
+    allProjects[0];
+  const squareProject =
+    allProjects.find((p) => p.aspectRatio === "1:1") ||
+    allProjects[2] ||
+    allProjects[0];
+  const cinemaProject =
+    allProjects.find((p) => p.aspectRatio === "16:9") ||
+    allProjects[3] ||
+    allProjects[0];
 
   return (
     <div className="flex flex-col w-full bg-black flex-1">
@@ -96,19 +113,19 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* 9:16 Vertical Reel Frame (Col 1-5) */}
             <div className="lg:col-span-5">
-              <ProjectCard project={reelProject} />
+              <ProjectCard project={reelProject} basePath="work" />
             </div>
 
             {/* Right Cluster (Col 6-12) */}
             <div className="lg:col-span-7 flex flex-col gap-8">
               {/* Row of 4:5 Carousel and 1:1 Square Frame */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <ProjectCard project={carouselProject} />
-                <ProjectCard project={squareProject} />
+                <ProjectCard project={carouselProject} basePath="work" />
+                <ProjectCard project={squareProject} basePath="work" />
               </div>
 
               {/* 16:9 Widescreen Cut Frame */}
-              <ProjectCard project={cinemaProject} />
+              <ProjectCard project={cinemaProject} basePath="work" />
             </div>
           </div>
         </div>

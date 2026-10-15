@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ProjectRecord, ProjectFilterStatus } from "@/types/project";
-import { togglePublishAction, deleteProjectAction } from "./actions";
+import { togglePublishAction, deleteProjectAction, purgeAiTestProjectsAction } from "./actions";
+import { isTemporaryTestProject } from "@/lib/projectFilters";
 import { Button } from "@/components/ui/Button";
 
 interface ProjectListClientProps {
@@ -16,10 +17,36 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [purgingTest, setPurgingTest] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
+  const testProjectsCount = projects.filter((p) => isTemporaryTestProject(p)).length;
+
+  const handlePurgeTestProjects = async () => {
+    try {
+      setPurgingTest(true);
+      setActionError(null);
+      setActionSuccess(null);
+
+      const res = await purgeAiTestProjectsAction();
+      if (!res.success) {
+        setActionError(res.error || "Failed to purge test projects.");
+      } else {
+        setProjects((prev) => prev.filter((p) => !isTemporaryTestProject(p)));
+        setActionSuccess(
+          `Purged ${res.count || 0} temporary/AI test items from the studio archive.`
+        );
+      }
+    } catch {
+      setActionError("Failed to purge temporary test projects.");
+    } finally {
+      setPurgingTest(false);
+    }
+  };
+
   const publishedCount = projects.filter((p) => p.published).length;
+
   const draftCount = projects.length - publishedCount;
 
   const filteredProjects = projects.filter((p) => {
@@ -132,6 +159,29 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
           CREATE PROJECT →
         </Button>
       </div>
+
+      {/* Temporary Test Content Warning Banner */}
+      {testProjectsCount > 0 && (
+        <div className="border border-primary bg-surface-container-low p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 font-label-mono text-xs text-primary font-bold uppercase tracking-widest">
+              <span className="w-2 h-2 bg-primary inline-block" aria-hidden="true" />
+              <span>TEMPORARY TEST CONTENT DETECTED ({testProjectsCount})</span>
+            </div>
+            <p className="font-body-sm text-xs text-paper-dim m-0">
+              Temporary or AI-generated development test items were detected. These are hidden from public view and can be permanently purged.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handlePurgeTestProjects}
+            disabled={purgingTest}
+            className="border border-primary bg-primary text-white hover:bg-white hover:text-black font-label-action uppercase tracking-widest text-xs px-5 py-2.5 font-bold transition-colors cursor-pointer select-none shrink-0"
+          >
+            {purgingTest ? "PURGING..." : "PURGE TEST CONTENT →"}
+          </button>
+        </div>
+      )}
 
       {/* Action Messages */}
       {actionError && (

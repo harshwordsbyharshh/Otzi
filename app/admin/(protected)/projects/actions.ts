@@ -239,3 +239,54 @@ export async function deleteProjectAction(
     return { success: false, error: message };
   }
 }
+
+export async function purgeAiTestProjectsAction(): Promise<{
+  success: boolean;
+  count?: number;
+  error?: string;
+}> {
+  try {
+    const { supabase } = await verifyAdminAuth();
+
+    const { data: allProjects, error } = await supabase
+      .from("projects")
+      .select("id, title, slug, description");
+
+    if (error || !allProjects) {
+      return { success: false, error: error?.message || "Failed to load projects." };
+    }
+
+    const testProjects = (allProjects as ProjectRecord[]).filter((p) => {
+      const text = `${p.title || ""} ${p.slug || ""} ${p.description || ""}`.toLowerCase();
+      return (
+        text.includes("ai generated") ||
+        text.includes("ai-generated") ||
+        text.includes("ai reel") ||
+        text.includes("ai post") ||
+        text.includes("temporary reel") ||
+        text.includes("temporary post") ||
+        text.includes("temp reel") ||
+        text.includes("temp post") ||
+        text.includes("test reel") ||
+        text.includes("test post") ||
+        text.includes("test content") ||
+        text.includes("temp content")
+      );
+    });
+
+    for (const p of testProjects) {
+      await deleteProjectAction(p.id);
+    }
+
+    revalidatePath("/admin/projects");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/work");
+    revalidatePath("/");
+
+    return { success: true, count: testProjects.length };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unexpected server error.";
+    return { success: false, error: message };
+  }
+}
+

@@ -4,6 +4,9 @@ import { getAllProjects, getProjectBySlug } from "@/lib/data/homepage";
 import { ProjectRecord, MediaRecord } from "@/types/project";
 import { createMediaSignedUrl } from "./media";
 
+import { isTemporaryTestProject } from "@/lib/projectFilters";
+export { isTemporaryTestProject };
+
 function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
   const isDirectUrl =
     p.cover_path?.startsWith("http://") ||
@@ -43,9 +46,17 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
       return getAllProjects();
     }
 
-    const projects = data as ProjectRecord[];
+    // Exclude any temporary or AI-generated test productions from public presentation
+    const validProjects = (data as ProjectRecord[]).filter(
+      (p) => !isTemporaryTestProject(p)
+    );
+
+    if (validProjects.length === 0) {
+      return getAllProjects();
+    }
+
     const dbMapped: SelectedProject[] = await Promise.all(
-      projects.map(async (p) => {
+      validProjects.map(async (p) => {
         const item = mapDbProjectToSelectedProject(p);
         if (p.cover_path) {
           const signedUrl = await createMediaSignedUrl(supabase, p.cover_path, 3600);
@@ -105,8 +116,8 @@ export async function getPublishedProjectBySlug(
 
     const p = data as ProjectRecord;
 
-    // Strict security constraint: unpublished drafts in Supabase must remain hidden
-    if (!p.published) {
+    // Strict security constraint: unpublished drafts and test projects must remain hidden
+    if (!p.published || isTemporaryTestProject(p)) {
       return undefined;
     }
 
