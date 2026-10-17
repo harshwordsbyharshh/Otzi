@@ -1,33 +1,47 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+function formatSupabaseUrl(url?: string): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 export async function createClient() {
   const cookieStore = await cookies();
   const supabaseKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = formatSupabaseUrl(rawUrl);
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    supabaseKey,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing user sessions.
-          }
-        },
+  if (!supabaseKey || !supabaseUrl) {
+    throw new Error(
+      "Supabase configuration missing: NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined."
+    );
+  }
+
+  return createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        } catch {
+          // The `setAll` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing user sessions.
+        }
+      },
+    },
+  });
 }
 
 /**
@@ -38,20 +52,26 @@ export async function createClient() {
  */
 export function createServiceRoleClient() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = formatSupabaseUrl(rawUrl);
 
   if (!serviceKey || !supabaseUrl) {
     return null;
   }
 
-  return createServerClient(supabaseUrl, serviceKey, {
-    cookies: {
-      getAll() {
-        return [];
+  try {
+    return createServerClient(supabaseUrl, serviceKey, {
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {},
       },
-      setAll() {},
-    },
-  });
+    });
+  } catch (err) {
+    console.error("[createServiceRoleClient] Client creation failed:", err);
+    return null;
+  }
 }
 
 /**
@@ -63,19 +83,25 @@ export function createPublicClient() {
   const supabaseKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = formatSupabaseUrl(rawUrl);
 
   if (!supabaseKey || !supabaseUrl) {
     return null;
   }
 
-  return createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll() {
-        return [];
+  try {
+    return createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {},
       },
-      setAll() {},
-    },
-  });
+    });
+  } catch (err) {
+    console.error("[createPublicClient] Client creation failed:", err);
+    return null;
+  }
 }
 

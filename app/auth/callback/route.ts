@@ -11,17 +11,23 @@ export async function GET(request: Request) {
     );
   }
 
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      return NextResponse.redirect(
+        new URL("/admin/login?error=recovery", request.url)
+      );
+    }
 
-  if (error) {
+    return NextResponse.redirect(
+      new URL("/admin/reset-password", request.url)
+    );
+  } catch (err) {
+    console.error("[auth/callback] Exception exchanging code:", err);
     return NextResponse.redirect(
       new URL("/admin/login?error=recovery", request.url)
     );
   }
-
-  return NextResponse.redirect(
-    new URL("/admin/reset-password", request.url)
-  );
 }
