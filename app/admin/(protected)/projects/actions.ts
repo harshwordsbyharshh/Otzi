@@ -174,6 +174,12 @@ export async function togglePublishAction(
   try {
     const { supabase } = await verifyAdminAuth();
 
+    const { data: projectRecord } = await supabase
+      .from("projects")
+      .select("slug")
+      .eq("id", id)
+      .maybeSingle();
+
     const { error } = await supabase
       .from("projects")
       .update({
@@ -189,6 +195,9 @@ export async function togglePublishAction(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${id}/edit`);
     revalidatePath("/work");
+    if (projectRecord?.slug) {
+      revalidatePath(`/work/${projectRecord.slug}`);
+    }
     revalidatePath("/");
 
     return { success: true };
@@ -203,6 +212,12 @@ export async function deleteProjectAction(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { supabase } = await verifyAdminAuth();
+
+    const { data: projectRecord } = await supabase
+      .from("projects")
+      .select("slug")
+      .eq("id", id)
+      .maybeSingle();
 
     // 1. Fetch any attached media records to purge storage files
     const { data: mediaItems } = await supabase
@@ -235,6 +250,9 @@ export async function deleteProjectAction(
     revalidatePath("/admin/projects");
     revalidatePath("/admin/dashboard");
     revalidatePath("/work");
+    if (projectRecord?.slug) {
+      revalidatePath(`/work/${projectRecord.slug}`);
+    }
     revalidatePath("/");
 
     return { success: true };

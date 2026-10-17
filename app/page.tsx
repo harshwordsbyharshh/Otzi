@@ -7,6 +7,9 @@ import { disciplinesData } from "@/lib/data/homepage";
 import { getPublishedProjects } from "@/lib/supabase/projects";
 import { SelectedProject } from "@/types/homepage";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const publishedProjects = await getPublishedProjects();
 

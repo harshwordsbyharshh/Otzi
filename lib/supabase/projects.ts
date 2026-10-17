@@ -88,12 +88,16 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
           if (signedUrl) {
             item.thumbnailUrl = signedUrl;
             item.mediaUrl = signedUrl;
+          } else {
+            const publicUrl = storageClient.storage.from("otzi-media").getPublicUrl(p.cover_path).data?.publicUrl;
+            item.thumbnailUrl = publicUrl || p.cover_path;
+            item.mediaUrl = publicUrl || p.cover_path;
           }
         }
 
         // Fallback: If no cover URL resolved, query the first attached media item
         if (!item.thumbnailUrl) {
-          const { data: firstMedia } = await supabase
+          const { data: firstMedia } = await (serviceClient || supabase)
             .from("media")
             .select("storage_path")
             .eq("project_id", p.id)
@@ -107,16 +111,17 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
               firstMedia.storage_path,
               3600
             );
-            if (fallbackSignedUrl) {
-              item.thumbnailUrl = fallbackSignedUrl;
-              item.mediaUrl = fallbackSignedUrl;
+            const fallbackPublicUrl = storageClient.storage.from("otzi-media").getPublicUrl(firstMedia.storage_path).data?.publicUrl;
+            const resolvedFallback = fallbackSignedUrl || fallbackPublicUrl || firstMedia.storage_path;
+            if (resolvedFallback) {
+              item.thumbnailUrl = resolvedFallback;
+              item.mediaUrl = resolvedFallback;
             }
           }
         }
 
-        // Case F: A project record exists but required media is missing.
-        // Exclude from public display with a warning so visitors never see broken cards.
-        if (!item.thumbnailUrl && !item.mediaUrl) {
+        // Case F: Exclude only if TRULY neither cover_path nor media items exist.
+        if (!p.cover_path && !item.thumbnailUrl && !item.mediaUrl) {
           console.warn(
             `[getPublishedProjects] Project "${p.title}" (${p.slug}) has no media. Excluded from public display.`
           );
@@ -172,11 +177,15 @@ export async function getPublishedProjectBySlug(
       if (coverSigned) {
         mapped.thumbnailUrl = coverSigned;
         mapped.mediaUrl = coverSigned;
+      } else {
+        const publicUrl = storageClient.storage.from("otzi-media").getPublicUrl(p.cover_path).data?.publicUrl;
+        mapped.thumbnailUrl = publicUrl || p.cover_path;
+        mapped.mediaUrl = publicUrl || p.cover_path;
       }
     }
 
     // Fetch attached published media items
-    const { data: mediaRows } = await supabase
+    const { data: mediaRows } = await (serviceClient || supabase)
       .from("media")
       .select("*")
       .eq("project_id", p.id)
@@ -187,13 +196,15 @@ export async function getPublishedProjectBySlug(
       const mediaSequence: ProjectMediaItem[] = await Promise.all(
         typedMedia.map(async (m) => {
           const signed = await createMediaSignedUrl(storageClient, m.storage_path, 3600);
+          const publicUrl = storageClient.storage.from("otzi-media").getPublicUrl(m.storage_path).data?.publicUrl;
+          const resolvedUrl = signed || publicUrl || m.storage_path;
           return {
             id: m.id,
             caption: m.alt_text || p.title,
             aspectRatio: (p.aspect_ratio as AspectRatio) || "9:16",
             assetType: m.type === "video" ? ("REEL" as AssetType) : ("POST" as AssetType),
-            thumbnailUrl: signed || undefined,
-            mediaUrl: signed || undefined,
+            thumbnailUrl: resolvedUrl,
+            mediaUrl: resolvedUrl,
           };
         })
       );
