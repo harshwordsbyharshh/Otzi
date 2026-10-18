@@ -76,6 +76,7 @@ export function MediaFrame({
   const [controlsVisible, setControlsVisible] = useState(false);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -104,6 +105,99 @@ export function MediaFrame({
     };
   }, []);
 
+  // 1. Single-video coordination across the page:
+  // When any video starts playback on the page, every other video is paused immediately.
+  useEffect(() => {
+    if (!isPlayableVideo) return;
+
+    const handleGlobalPlay = (e: Event) => {
+      const customEvent = e as CustomEvent<{ source?: HTMLVideoElement }>;
+      const source = customEvent.detail?.source;
+      if (source && source !== videoRef.current) {
+        const video = videoRef.current;
+        if (video && !video.paused) {
+          video.pause();
+          setIsPlaying(false);
+          setControlsVisible(true);
+        }
+      }
+    };
+
+    window.addEventListener("otzi:video-playback-start", handleGlobalPlay);
+    return () => {
+      window.removeEventListener("otzi:video-playback-start", handleGlobalPlay);
+    };
+  }, [isPlayableVideo]);
+
+  // 2. Viewport visibility observation:
+  // When a playing video leaves the visible viewport while scrolling, automatically pause it.
+  // When scrolling back into the viewport, do NOT auto-resume (user must press play).
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !isPlayableVideo) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || entry.intersectionRatio <= 0) {
+            const video = videoRef.current;
+            if (video && !video.paused) {
+              const isFullscreen =
+                (typeof document !== "undefined" && document.fullscreenElement === video) ||
+                // @ts-expect-error webkitDisplayingFullscreen for iOS Safari
+                Boolean(video.webkitDisplayingFullscreen);
+
+              if (!isFullscreen) {
+                video.pause();
+                setIsPlaying(false);
+                setControlsVisible(true);
+              }
+            }
+          }
+        }
+      },
+      {
+        threshold: 0,
+      }
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isPlayableVideo]);
+
+  // 3. Document visibility: pause video when the user switches tabs or backgrounds the window
+  useEffect(() => {
+    if (!isPlayableVideo) return;
+
+    const handleVisibility = () => {
+      if (typeof document !== "undefined" && document.hidden) {
+        const video = videoRef.current;
+        if (video && !video.paused) {
+          video.pause();
+          setIsPlaying(false);
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [isPlayableVideo]);
+
+  // 4. Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      const video = videoRef.current;
+      if (video && !video.paused) {
+        video.pause();
+      }
+    };
+  }, []);
+
   const togglePlay = async (e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
@@ -114,6 +208,13 @@ export function MediaFrame({
 
     if (video.paused || video.ended) {
       setPlaybackError(null);
+
+      // Pre-emptively pause all other playing videos across the page
+      window.dispatchEvent(
+        new CustomEvent("otzi:video-playback-start", {
+          detail: { source: video },
+        })
+      );
 
       // Kickstart stalled metadata decoding on mobile connections
       if (video.readyState === 0) {
@@ -194,6 +295,7 @@ export function MediaFrame({
 
   return (
     <div
+      ref={containerRef}
       aria-label={title}
       onMouseMove={isPlaying ? showControlsTemporarily : undefined}
       onMouseEnter={isPlaying ? showControlsTemporarily : undefined}
@@ -239,6 +341,11 @@ export function MediaFrame({
               onPlay={() => {
                 setIsPlaying(true);
                 setPlaybackError(null);
+                window.dispatchEvent(
+                  new CustomEvent("otzi:video-playback-start", {
+                    detail: { source: videoRef.current },
+                  })
+                );
               }}
               onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}
