@@ -32,6 +32,8 @@ export interface SelectedProject {
   thumbnailUrl?: string;
   mediaUrl?: string;
   slidesCount?: number;
+  isFeatured?: boolean;
+  featuredOrder?: number | null;
 }
 
 export interface Discipline {

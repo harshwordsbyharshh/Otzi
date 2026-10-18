@@ -22,14 +22,22 @@ export default async function HomePage() {
   const selectedProjects: SelectedProject[] = [];
   const usedIds = new Set<string>();
 
-  // Priority 1: Vertical 9:16 asset for primary slot if available
-  const verticalProject = uniqueProjects.find((p) => p.aspectRatio === "9:16");
-  if (verticalProject) {
-    selectedProjects.push(verticalProject);
-    usedIds.add(verticalProject.id);
+  // Primary slot (Col 1-5 hero frame):
+  // 1. If featured reels exist, use Featured Reel #1.
+  // 2. Fallback to the first vertical 9:16 asset if available.
+  // 3. Otherwise fallback to the first project.
+  const topFeatured = uniqueProjects.find((p) => p.isFeatured && p.featuredOrder === 1);
+  const primaryHero =
+    topFeatured ||
+    uniqueProjects.find((p) => p.aspectRatio === "9:16") ||
+    uniqueProjects[0];
+
+  if (primaryHero) {
+    selectedProjects.push(primaryHero);
+    usedIds.add(primaryHero.id);
   }
 
-  // Priority 2: Distinct remaining projects up to 4 slots total
+  // Distinct remaining projects up to 4 slots total in strict priority order
   for (const p of uniqueProjects) {
     if (selectedProjects.length >= 4) break;
     if (!usedIds.has(p.id)) {

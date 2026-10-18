@@ -13,6 +13,8 @@ export interface ProjectRecord {
   description: string | null;
   cover_path: string | null;
   published: boolean;
+  is_featured?: boolean;
+  featured_order?: number | null;
   created_by?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -30,6 +32,8 @@ export type ProjectInput = {
   description?: string | null;
   cover_path?: string | null;
   published: boolean;
+  is_featured?: boolean;
+  featured_order?: number | null;
 };
 
 export type ProjectFilterStatus = "all" | "published" | "draft";

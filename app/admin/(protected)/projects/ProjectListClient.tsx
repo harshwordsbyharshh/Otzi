@@ -3,9 +3,16 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ProjectRecord, ProjectFilterStatus } from "@/types/project";
-import { togglePublishAction, deleteProjectAction, purgeAiTestProjectsAction } from "./actions";
+import {
+  togglePublishAction,
+  deleteProjectAction,
+  purgeAiTestProjectsAction,
+  pinFeaturedReelAction,
+  unpinFeaturedReelAction,
+} from "./actions";
 import { isTemporaryTestProject } from "@/lib/projectFilters";
 import { Button } from "@/components/ui/Button";
+import { FeaturedReelsManager } from "./FeaturedReelsManager";
 
 interface ProjectListClientProps {
   initialProjects: ProjectRecord[];
@@ -15,11 +22,16 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
   const [projects, setProjects] = useState<ProjectRecord[]>(initialProjects);
   const [filter, setFilter] = useState<ProjectFilterStatus>("all");
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [pinningId, setPinningId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [purgingTest, setPurgingTest] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  const featuredCount = projects.filter(
+    (p) => p.is_featured && p.published && p.asset_type === "REEL"
+  ).length;
 
   const testProjectsCount = projects.filter((p) => isTemporaryTestProject(p)).length;
 
@@ -109,9 +121,78 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
     }
   };
 
+  const handleTablePin = async (id: string) => {
+    try {
+      setActionError(null);
+      setActionSuccess(null);
+      setPinningId(id);
+
+      const res = await pinFeaturedReelAction(id);
+      if (!res.success) {
+        setActionError(res.error || "Failed to pin reel.");
+        return;
+      }
+
+      setProjects((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? { ...item, is_featured: true, featured_order: res.featured_order }
+            : item
+        )
+      );
+      setActionSuccess("Reel pinned to Featured Reels.");
+    } catch {
+      setActionError("Failed to pin reel as featured.");
+    } finally {
+      setPinningId(null);
+    }
+  };
+
+  const handleTableUnpin = async (id: string) => {
+    try {
+      setActionError(null);
+      setActionSuccess(null);
+      setPinningId(id);
+
+      const res = await unpinFeaturedReelAction(id);
+      if (!res.success) {
+        setActionError(res.error || "Failed to unpin reel.");
+        return;
+      }
+
+      setProjects((prev) => {
+        const remainingFeatured = prev
+          .filter((item) => item.id !== id && item.is_featured)
+          .sort((a, b) => (a.featured_order ?? 999) - (b.featured_order ?? 999));
+
+        return prev.map((item) => {
+          if (item.id === id) {
+            return { ...item, is_featured: false, featured_order: null };
+          }
+          const newOrder = remainingFeatured.findIndex((r) => r.id === item.id);
+          if (newOrder !== -1) {
+            return { ...item, is_featured: true, featured_order: newOrder + 1 };
+          }
+          return item;
+        });
+      });
+      setActionSuccess("Reel unpinned and returned to normal chronological order.");
+    } catch {
+      setActionError("Failed to unpin reel.");
+    } finally {
+      setPinningId(null);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-8 w-full">
-      {/* Top Filter and Actions Bar */}
+    <div className="flex flex-col gap-10 w-full">
+      {/* 1. Featured Reels Top 5 Curation Section */}
+      <FeaturedReelsManager
+        projects={projects}
+        onProjectsChange={setProjects}
+      />
+
+      {/* 2. Top Filter and Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#262626] pb-6">
         {/* Status Filter Tabs */}
         <div className="flex items-center gap-2">
@@ -187,18 +268,36 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
       {actionError && (
         <div
           role="alert"
-          className="border border-primary bg-black p-4 text-primary font-label-mono text-xs uppercase tracking-wider leading-relaxed"
+          className="border border-primary bg-black p-4 text-primary font-label-mono text-xs uppercase tracking-wider leading-relaxed flex items-center justify-between gap-4"
         >
-          {actionError}
+          <span>{actionError}</span>
+          <button
+            type="button"
+            onClick={() => setActionError(null)}
+            className="text-primary hover:text-white transition-colors cursor-pointer text-sm font-bold px-2 py-0.5 select-none"
+            title="Dismiss"
+            aria-label="Dismiss error"
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {actionSuccess && (
         <div
           role="status"
-          className="border border-white/40 bg-black p-4 text-white font-label-mono text-xs uppercase tracking-wider leading-relaxed"
+          className="border border-white/40 bg-black p-4 text-white font-label-mono text-xs uppercase tracking-wider leading-relaxed flex items-center justify-between gap-4"
         >
-          {actionSuccess}
+          <span>{actionSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setActionSuccess(null)}
+            className="text-white/60 hover:text-white transition-colors cursor-pointer text-sm font-bold px-2 py-0.5 select-none"
+            title="Dismiss"
+            aria-label="Dismiss notification"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -237,8 +336,11 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
           {/* Project Rows */}
           {filteredProjects.map((p) => {
             const isToggling = togglingId === p.id;
+            const isPinning = pinningId === p.id;
             const isDeleting = deletingId === p.id;
             const isConfirmingDelete = confirmDeleteId === p.id;
+            const isReel = p.asset_type === "REEL";
+            const isPinned = Boolean(p.is_featured && p.published && isReel);
 
             return (
               <div
@@ -278,23 +380,31 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
                   </span>
                 </div>
 
-                {/* Status Badge */}
-                <div className="lg:col-span-2 flex items-center gap-2">
-                  {p.published ? (
-                    <span className="inline-flex items-center gap-1.5 border border-white/60 bg-black px-2.5 py-1 text-white font-label-mono text-[10px] uppercase tracking-wider font-bold">
-                      <span className="w-1.5 h-1.5 bg-white inline-block" aria-hidden="true" />
-                      PUBLISHED
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 border border-[#333] bg-black px-2.5 py-1 text-paper-dim font-label-mono text-[10px] uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 bg-[#555] inline-block" aria-hidden="true" />
-                      DRAFT
+                {/* Status Badge & Featured Pin Badge */}
+                <div className="lg:col-span-2 flex flex-col gap-1.5 w-full">
+                  <div className="flex items-center gap-2">
+                    {p.published ? (
+                      <span className="inline-flex items-center gap-1.5 border border-white/60 bg-black px-2 py-0.5 text-white font-label-mono text-[10px] uppercase tracking-wider font-bold">
+                        <span className="w-1.5 h-1.5 bg-white inline-block" aria-hidden="true" />
+                        PUBLISHED
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 border border-[#333] bg-black px-2 py-0.5 text-paper-dim font-label-mono text-[10px] uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 bg-[#555] inline-block" aria-hidden="true" />
+                        DRAFT
+                      </span>
+                    )}
+                  </div>
+                  {isPinned && (
+                    <span className="inline-flex items-center gap-1.5 border border-primary bg-primary/10 px-2 py-0.5 text-primary font-label-mono text-[10px] uppercase tracking-wider font-bold self-start">
+                      <span className="w-1.5 h-1.5 bg-primary inline-block" aria-hidden="true" />
+                      FEATURED #{p.featured_order}
                     </span>
                   )}
                 </div>
 
                 {/* Action Controls */}
-                <div className="lg:col-span-2 flex items-center justify-start lg:justify-end gap-3 w-full pt-2 lg:pt-0 border-t lg:border-t-0 border-[#262626]">
+                <div className="lg:col-span-2 flex items-center justify-start lg:justify-end gap-2.5 w-full pt-2 lg:pt-0 border-t lg:border-t-0 border-[#262626]">
                   {isConfirmingDelete ? (
                     <div className="flex items-center gap-2">
                       <button
@@ -316,6 +426,35 @@ export function ProjectListClient({ initialProjects }: ProjectListClientProps) {
                     </div>
                   ) : (
                     <>
+                      {/* Pin / Unpin Action (for published reels) */}
+                      {p.published && isReel && (
+                        isPinned ? (
+                          <button
+                            type="button"
+                            onClick={() => handleTableUnpin(p.id)}
+                            disabled={isPinning}
+                            className="font-label-mono text-[11px] text-primary hover:text-white uppercase tracking-wider transition-colors cursor-pointer py-1 px-2 border border-primary/40 hover:border-primary"
+                            title="Unpin from Featured Reels"
+                          >
+                            {isPinning ? "..." : "UNPIN"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleTablePin(p.id)}
+                            disabled={isPinning || featuredCount >= 5}
+                            className="font-label-mono text-[11px] text-paper-dim hover:text-white uppercase tracking-wider transition-colors cursor-pointer py-1 px-2 border border-[#262626] hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={
+                              featuredCount >= 5
+                                ? "Maximum 5 featured reels reached (unpin one first)"
+                                : "Pin as Featured Reel"
+                            }
+                          >
+                            {isPinning ? "..." : "PIN"}
+                          </button>
+                        )
+                      )}
+
                       {/* Publish / Unpublish Toggle */}
                       <button
                         type="button"

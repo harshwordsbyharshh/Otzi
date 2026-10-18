@@ -4,7 +4,13 @@ import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ProjectRecord, ProjectInput } from "@/types/project";
-import { createProjectAction, updateProjectAction, deleteProjectAction } from "./actions";
+import {
+  createProjectAction,
+  updateProjectAction,
+  deleteProjectAction,
+  pinFeaturedReelAction,
+  unpinFeaturedReelAction,
+} from "./actions";
 import { Button } from "@/components/ui/Button";
 import { ProjectMediaManager } from "@/components/media/ProjectMediaManager";
 
@@ -52,6 +58,9 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const [description, setDescription] = useState(project?.description || "");
   const [coverPath, setCoverPath] = useState(project?.cover_path || "");
   const [published, setPublished] = useState(project?.published ?? false);
+  const [isFeatured, setIsFeatured] = useState(Boolean(project?.is_featured));
+  const [featuredOrder, setFeaturedOrder] = useState<number | null>(project?.featured_order ?? null);
+  const [pinningFeatured, setPinningFeatured] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -60,6 +69,47 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const formRef = useRef<HTMLFormElement>(null);
+
+  const handleToggleFeatured = async () => {
+    if (!project) return;
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setPinningFeatured(true);
+
+    try {
+      if (isFeatured) {
+        const res = await unpinFeaturedReelAction(project.id);
+        if (!res.success) {
+          setErrorMessage(res.error || "Failed to unpin featured reel.");
+        } else {
+          setIsFeatured(false);
+          setFeaturedOrder(null);
+          setSuccessMessage("Reel unpinned from Featured Reels.");
+        }
+      } else {
+        if (!published) {
+          setErrorMessage("Only published projects can be pinned as featured reels.");
+          return;
+        }
+        if (assetType !== "REEL") {
+          setErrorMessage('Only projects with format "REEL" can be pinned as featured.');
+          return;
+        }
+        const res = await pinFeaturedReelAction(project.id);
+        if (!res.success) {
+          setErrorMessage(res.error || "Failed to pin featured reel.");
+        } else {
+          setIsFeatured(true);
+          setFeaturedOrder(res.featured_order ?? 1);
+          setSuccessMessage(`Reel pinned to Featured Reels at position #${res.featured_order ?? 1}.`);
+        }
+      }
+    } catch {
+      setErrorMessage("Network error while updating featured status.");
+    } finally {
+      setPinningFeatured(false);
+    }
+  };
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -451,6 +501,48 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             </span>
           </label>
         </div>
+
+        {/* Featured Reel (Top 5) Pin Status */}
+        {mode === "edit" && assetType === "REEL" && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border border-[#262626] p-4 bg-black gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-label-mono text-xs text-white uppercase tracking-wider font-bold">
+                  {isFeatured && published
+                    ? `FEATURED REEL: POSITION #${featuredOrder ?? 1}`
+                    : "FEATURED REEL: UNPINNED"}
+                </span>
+                {isFeatured && published && (
+                  <span className="w-1.5 h-1.5 bg-primary inline-block" aria-hidden="true" />
+                )}
+              </div>
+              <p className="font-label-mono text-[11px] text-paper-dim uppercase tracking-wider m-0">
+                {isFeatured && published
+                  ? "This reel appears prominently in the top 5 curated slots on the homepage and work page."
+                  : "Pin this reel to feature it in the top 5 curated positions. Unpinned reels appear in chronological order."}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={handleToggleFeatured}
+                disabled={pinningFeatured || (!isFeatured && !published)}
+                className={`font-label-mono text-xs uppercase tracking-wider px-4 py-2 border transition-colors cursor-pointer select-none font-bold ${
+                  isFeatured
+                    ? "border-primary text-primary hover:bg-primary hover:text-white"
+                    : "border-white bg-white text-black hover:bg-primary hover:border-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                }`}
+              >
+                {pinningFeatured
+                  ? "UPDATING..."
+                  : isFeatured
+                  ? "UNPIN FROM FEATURED"
+                  : "PIN AS FEATURED REEL"}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#262626]">
           <div className="flex items-center gap-4 w-full sm:w-auto">

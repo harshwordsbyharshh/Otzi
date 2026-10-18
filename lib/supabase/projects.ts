@@ -29,7 +29,45 @@ function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
     deliverables: [],
     thumbnailUrl: isDirectUrl ? p.cover_path! : undefined,
     mediaUrl: isDirectUrl ? p.cover_path! : undefined,
+    isFeatured: p.is_featured ?? false,
+    featuredOrder: p.featured_order ?? null,
   };
+}
+
+/**
+ * Strict 3-tier ordering required for public ÖTZI project display:
+ * Priority 1: Featured reels, ordered by saved manual position (1..5).
+ * Priority 2: All other published reels, newest first.
+ * Priority 3: Static posts, campaign artwork, photography projects, and case studies, newest first.
+ * Tie-breaker: Deterministic sort by id DESC.
+ */
+export function compareProjectsForDisplay(a: ProjectRecord, b: ProjectRecord): number {
+  const aIsReel = a.asset_type === "REEL";
+  const bIsReel = b.asset_type === "REEL";
+
+  const aFeatured = Boolean(a.is_featured && aIsReel && a.featured_order && a.featured_order >= 1 && a.featured_order <= 5);
+  const bFeatured = Boolean(b.is_featured && bIsReel && b.featured_order && b.featured_order >= 1 && b.featured_order <= 5);
+
+  // Priority 1: Both are featured reels -> sort by manual position ascending (1..5)
+  if (aFeatured && bFeatured) {
+    return (a.featured_order || 0) - (b.featured_order || 0);
+  }
+  // One is featured reel, the other is not -> featured reel comes first
+  if (aFeatured) return -1;
+  if (bFeatured) return 1;
+
+  // Priority 2 vs Priority 3: Unpinned reels vs non-reels
+  if (aIsReel && !bIsReel) return -1;
+  if (!aIsReel && bIsReel) return 1;
+
+  // Within the same tier (both unpinned reels, or both non-reels):
+  // Newest first by created_at DESC with deterministic tie-break
+  const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+  const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+  if (timeB !== timeA) {
+    return timeB - timeA;
+  }
+  return b.id.localeCompare(a.id);
 }
 
 export async function getPublishedProjects(): Promise<SelectedProject[]> {
@@ -79,6 +117,9 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
       seenSlugs.add(p.slug);
       distinctProjects.push(p);
     }
+
+    // Sort projects strictly: Featured reels (1..5) -> Remaining reels (newest) -> Static posts (newest)
+    distinctProjects.sort(compareProjectsForDisplay);
 
     const dbMapped: (SelectedProject | null)[] = await Promise.all(
       distinctProjects.map(async (p) => {
