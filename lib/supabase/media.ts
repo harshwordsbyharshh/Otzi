@@ -9,7 +9,15 @@ export const STORAGE_BUCKET = "otzi-media";
 
 // V1 Upload Size Limits
 export const IMAGE_MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
-export const VIDEO_MAX_SIZE_BYTES = 300 * 1024 * 1024; // 300 MB
+
+// Supabase Free Tier enforces a strict single-file upload limit of 50 MB (52,428,800 bytes).
+// Setting this to 50MB ensures user files are validated accurately before hitting Supabase Storage.
+// If the Supabase plan is upgraded to Pro, this can be increased via NEXT_PUBLIC_MAX_VIDEO_SIZE_MB.
+const configuredVideoLimitMb =
+  typeof process !== "undefined" && process.env.NEXT_PUBLIC_MAX_VIDEO_SIZE_MB
+    ? parseInt(process.env.NEXT_PUBLIC_MAX_VIDEO_SIZE_MB, 10)
+    : 50;
+export const VIDEO_MAX_SIZE_BYTES = configuredVideoLimitMb * 1024 * 1024;
 
 // Allowed MIME types
 export const ALLOWED_IMAGE_MIME_TYPES = [
@@ -127,9 +135,10 @@ export function validateMediaUpload(file: {
 
   if (isVideo && file.size > VIDEO_MAX_SIZE_BYTES) {
     const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    const limitMb = Math.round(VIDEO_MAX_SIZE_BYTES / (1024 * 1024));
     return {
       valid: false,
-      error: `Video exceeds the 300MB limit (current: ${sizeMb}MB). Please provide a web cutdown under 300MB.`,
+      error: `Video exceeds the ${limitMb}MB storage limit (current: ${sizeMb}MB). Supabase Storage Free Tier enforces a maximum of 50MB per file upload. Please provide a 1080p web cutdown under ${limitMb}MB.`,
     };
   }
 

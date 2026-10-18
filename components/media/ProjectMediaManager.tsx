@@ -10,7 +10,7 @@ import {
   deleteProjectMediaAction,
   setProjectCoverAction,
 } from "@/app/admin/(protected)/projects/mediaActions";
-import { validateMediaUpload, STORAGE_BUCKET } from "@/lib/supabase/media";
+import { validateMediaUpload, STORAGE_BUCKET, VIDEO_MAX_SIZE_BYTES } from "@/lib/supabase/media";
 import { createClient } from "@/lib/supabase/client";
 
 interface ProjectMediaManagerProps {
@@ -224,7 +224,15 @@ export function ProjectMediaManager({
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "An unexpected network error occurred during upload.";
-      setErrorMessage(msg);
+      const isSizeError =
+        msg.includes("413") ||
+        msg.toLowerCase().includes("too large") ||
+        msg.toLowerCase().includes("exceeded the maximum") ||
+        msg.toLowerCase().includes("size limit");
+      const friendlyMsg = isSizeError
+        ? `Storage upload rejected: File exceeds Supabase single-file limit (50MB on Free Tier). Please provide a 1080p web cutdown under 50MB.`
+        : msg;
+      setErrorMessage(friendlyMsg);
     } finally {
       setUploading(false);
     }
@@ -361,11 +369,16 @@ export function ProjectMediaManager({
       {/* Upload Dropzone & Controls */}
       <div className="border border-[#262626] p-5 bg-black flex flex-col gap-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#262626] pb-3">
-          <span className="font-label-mono text-xs uppercase tracking-wider text-white font-bold">
-            UPLOAD PRODUCTION ASSET
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="font-label-mono text-xs uppercase tracking-wider text-white font-bold">
+              UPLOAD PRODUCTION ASSET
+            </span>
+            <span className="font-label-mono text-[9px] text-paper-dim uppercase tracking-wider">
+              Mobile Spec: 1080x1920 (9:16), H.264 Level 4.0/4.1, Fast Start (moov at start)
+            </span>
+          </div>
           <span className="font-label-mono text-[10px] text-paper-dim uppercase">
-            MAX: 15MB (IMAGE) / 300MB (VIDEO)
+            MAX: 15MB (IMAGE) / {Math.round(VIDEO_MAX_SIZE_BYTES / (1024 * 1024))}MB (VIDEO)
           </span>
         </div>
 

@@ -55,11 +55,26 @@ export function MediaFrame({
       (!isImageExtension &&
         (assetType === "REEL" || assetType === "SHORT FILM")));
 
+  const posterUrl =
+    thumbnailUrl && /\.(jpe?g|png|webp|gif|svg)(\?.*)?$/i.test(thumbnailUrl)
+      ? thumbnailUrl
+      : undefined;
+
+  // Mobile Safari optimization: Appending #t=0.001 forces iOS WebKit to seek to 1ms
+  // and render the first video frame as a poster instead of displaying an empty black box.
+  const videoSrc =
+    isPlayableVideo && activeMediaUrl
+      ? posterUrl || activeMediaUrl.includes("#")
+        ? activeMediaUrl
+        : `${activeMediaUrl}#t=0.001`
+      : activeMediaUrl;
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(false);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -98,19 +113,37 @@ export function MediaFrame({
     if (!video) return;
 
     if (video.paused || video.ended) {
+      setPlaybackError(null);
+
+      // Kickstart stalled metadata decoding on mobile connections
+      if (video.readyState === 0) {
+        try {
+          video.load();
+        } catch {
+          // ignore load trigger errors
+        }
+      }
+
       try {
         video.muted = isMuted;
         await video.play();
         setIsPlaying(true);
       } catch {
-        // Fallback if browser policy blocks unmuted audio on gesture
+        // Fallback if mobile browser policy blocks unmuted audio on gesture
         try {
           video.muted = true;
           setIsMuted(true);
           await video.play();
           setIsPlaying(true);
-        } catch {
-          // Play was completely blocked by browser
+        } catch (playErr) {
+          console.warn("[MediaFrame] Playback blocked or failed on device:", playErr);
+          if (video.error) {
+            setPlaybackError(
+              video.error.code === 3
+                ? "DECODE ERROR (REQUIRES 1080P H.264 CUTDOWN)"
+                : "PLAYBACK UNSUPPORTED ON THIS DEVICE"
+            );
+          }
         }
       }
       showControlsTemporarily();
@@ -172,9 +205,11 @@ export function MediaFrame({
           {isPlayableVideo ? (
             <video
               ref={videoRef}
-              src={activeMediaUrl}
+              src={videoSrc}
+              poster={posterUrl}
               preload="metadata"
               playsInline
+              {...({ "webkit-playsinline": "true", "x5-playsinline": "true" } as Record<string, string>)}
               loop
               className="w-full h-full object-cover cursor-pointer"
               onClick={togglePlay}
@@ -187,8 +222,24 @@ export function MediaFrame({
                 if (videoRef.current) {
                   setDuration(videoRef.current.duration);
                 }
+                setPlaybackError(null);
               }}
-              onPlay={() => setIsPlaying(true)}
+              onError={(e) => {
+                const err = e.currentTarget.error;
+                console.warn("[MediaFrame] Video error:", err?.code, err?.message);
+                if (err?.code === 3) {
+                  setPlaybackError("DECODE ERROR (REQUIRES 1080P H.264 CUTDOWN)");
+                } else if (err?.code === 4) {
+                  setPlaybackError("VIDEO FORMAT UNSUPPORTED");
+                } else {
+                  setPlaybackError("PLAYBACK ERROR");
+                }
+                setIsPlaying(false);
+              }}
+              onPlay={() => {
+                setIsPlaying(true);
+                setPlaybackError(null);
+              }}
               onPause={() => setIsPlaying(false)}
               onEnded={() => setIsPlaying(false)}
             />
@@ -237,32 +288,50 @@ export function MediaFrame({
         <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-[#262626]" />
         <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-[#262626]" />
 
-        {/* Play indicator trigger: ONLY rendered when playable video exists and is currently paused.
-            Disappears completely once video starts playing so it never blocks the video content. */}
+        {/* Play indicator trigger: Rendered when playable video exists and is currently paused.
+            If a mobile codec / decode error occurred, render an informative ÖTZI-styled badge. */}
         {isPlayableVideo && !isPlaying && (
-          <button
-            type="button"
-            onClick={togglePlay}
-            aria-label={
-              assetType === "SHORT FILM"
-                ? "Play Film with audio"
-                : "Play Reel with audio"
-            }
-            className="pointer-events-auto bg-black/90 border border-[#262626] hover:border-white px-5 py-2.5 flex items-center gap-2.5 text-white font-label-action text-label-action tracking-widest uppercase transition-colors cursor-pointer select-none z-20 shadow-xl"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="currentColor"
-              aria-hidden="true"
+          playbackError ? (
+            <div className="pointer-events-auto bg-black/95 border border-[#333] p-4 flex flex-col items-center gap-2 max-w-[280px] text-center z-20 shadow-2xl">
+              <span className="font-label-mono text-[10px] text-primary uppercase tracking-widest font-bold">
+                {playbackError}
+              </span>
+              <span className="font-label-mono text-[9px] text-paper-dim uppercase tracking-wider leading-relaxed">
+                Hardware decoder exceeded on this mobile device. Tap below to retry.
+              </span>
+              <button
+                type="button"
+                onClick={togglePlay}
+                className="mt-1 bg-surface-container hover:bg-surface-container-high border border-[#444] px-3 py-1 font-label-mono text-[10px] text-white uppercase tracking-widest cursor-pointer transition-colors"
+              >
+                RETRY PLAYBACK
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={togglePlay}
+              aria-label={
+                assetType === "SHORT FILM"
+                  ? "Play Film with audio"
+                  : "Play Reel with audio"
+              }
+              className="pointer-events-auto bg-black/90 border border-[#262626] hover:border-white px-5 py-2.5 flex items-center gap-2.5 text-white font-label-action text-label-action tracking-widest uppercase transition-colors cursor-pointer select-none z-20 shadow-xl"
             >
-              <path d="M3 2L12 7L3 12V2Z" />
-            </svg>
-            <span>
-              {assetType === "SHORT FILM" ? "PLAY FILM" : "PLAY REEL"}
-            </span>
-          </button>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M3 2L12 7L3 12V2Z" />
+              </svg>
+              <span>
+                {assetType === "SHORT FILM" ? "PLAY FILM" : "PLAY REEL"}
+              </span>
+            </button>
+          )
         )}
       </div>
 
