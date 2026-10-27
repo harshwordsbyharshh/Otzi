@@ -19,17 +19,49 @@ const hankenGrotesk = Hanken_Grotesk({
 
 const siteUrl = getSiteUrl();
 
+/* 
+ * JSON-LD Structured Data
+ * Added for SEO and AI/search engine visibility.
+ */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "ÖTZI",
+      url: siteUrl,
+      description:
+        "ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      name: "ÖTZI",
+      url: siteUrl,
+      description: "ÖTZI — Social Media Management & Creative Production",
+      publisher: {
+        "@id": `${siteUrl}/#organization`,
+      },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+
   title: {
     default: "ÖTZI — Social Media Management & Creative Production",
     template: "%s | ÖTZI",
   },
+
   description:
     "ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.",
+
   alternates: {
     canonical: "/",
   },
+
   openGraph: {
     title: "ÖTZI — Social Media Management & Creative Production",
     description:
@@ -39,12 +71,14 @@ export const metadata: Metadata = {
     type: "website",
     url: siteUrl,
   },
+
   twitter: {
     card: "summary",
     title: "ÖTZI — Social Media Management & Creative Production",
     description:
       "ÖTZI is a social media management and creative production agency. We provide strategic direction, content creation, and multi-format campaign execution for brands.",
   },
+
   robots: {
     index: true,
     follow: true,
@@ -56,6 +90,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+
   icons: {
     icon: "/favicon.ico",
   },
@@ -78,8 +113,20 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${hankenGrotesk.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-white selection:bg-primary selection:text-white font-body-md text-body-md">
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+
         <Header />
-        <main className="w-full pt-[72px] flex-1 flex flex-col">{children}</main>
+
+        <main className="w-full pt-[72px] flex-1 flex flex-col">
+          {children}
+        </main>
+
         <Footer />
       </body>
     </html>
