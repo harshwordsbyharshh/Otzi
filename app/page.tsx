@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { HairlineDivider } from "@/components/ui/HairlineDivider";
 import { ArrowLink } from "@/components/ui/ArrowLink";
@@ -51,8 +52,26 @@ export default async function HomePage() {
       {/* ====================================================================
           1. HERO SECTION
           ==================================================================== */}
-      <section className="w-full bg-black border-b border-[#262626]" aria-label="Agency Overview">
-        <div className="max-w-[1680px] mx-auto px-4 md:px-6 lg:px-10 pt-16 md:pt-24 lg:pt-32 pb-16 md:pb-24">
+      <section
+        className="relative w-full bg-[#08090B] border-b border-[#262626] overflow-hidden min-h-[calc(100svh-72px)] flex flex-col justify-center"
+        aria-label="Agency Overview"
+      >
+        {/* Cinematic Mountain Background Layer */}
+        <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
+          <Image
+            src="/images/otzi-hero.png"
+            alt="ÖTZI Cinematic Mountain Background"
+            fill
+            priority
+            quality={90}
+            sizes="100vw"
+            className="object-cover object-[56%_25%] sm:object-[54%_28%] md:object-[52%_35%] lg:object-[50%_35%] animate-hero-bg"
+          />
+          <div className="hero-gradient-overlay" aria-hidden="true" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-[1680px] w-full mx-auto px-4 md:px-6 lg:px-10 pt-8 sm:pt-12 md:pt-16 lg:pt-24 pb-12 sm:pb-16 md:pb-20 lg:pb-24 animate-hero-content">
           <div className="flex flex-col gap-6 md:gap-8">
             {/* Header Accent Motif */}
             <div className="flex items-center gap-2 font-label-mono text-label-mono uppercase tracking-widest text-primary font-bold">
@@ -61,24 +80,24 @@ export default async function HomePage() {
             </div>
 
             {/* Monumental Editorial Headline */}
-            <h1 className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none">
+            <h1 className="font-display-xl text-display-xl uppercase tracking-tighter text-white m-0 max-w-6xl leading-none select-none text-balance">
               WE BUILD BRANDS THAT MOVE.
             </h1>
 
             {/* Supporting Line */}
-            <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold">
+            <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold text-balance">
               SOCIAL MEDIA MANAGEMENT &amp; CREATIVE PRODUCTION.
             </div>
 
             {/* Asymmetric Split Grid: Description & Capabilities */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-8 md:pt-12 border-t border-[#262626] items-start">
-              <div className="lg:col-span-7 space-y-6">
+              <div className="lg:col-span-7 space-y-6 min-w-0">
                 <p className="font-body-lg text-body-lg text-paper-dim leading-relaxed max-w-2xl m-0">
                   ÖTZI builds and manages the digital presence brands need to stay visible, relevant, and moving forward — from social strategy and content production to paid campaigns, SEO, and AI-powered systems.
                 </p>
-                <div className="flex flex-wrap gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-4 pt-4">
                   <Button variant="accent" href="/contact">
-                    START A PROJECT →
+                    START A PROJECT
                   </Button>
                   <Button variant="secondary" href="/work">
                     EXPLORE WORK
@@ -87,7 +106,7 @@ export default async function HomePage() {
               </div>
 
               {/* Right Specifications & Discipline Tags */}
-              <div className="lg:col-span-5 flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8">
+              <div className="lg:col-span-5 flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-[#262626] pt-6 lg:pt-0 lg:pl-8 min-w-0">
                 <div className="font-label-mono text-label-mono uppercase tracking-widest text-paper-dim font-bold">
                   OUR EXPERTISE
                 </div>
@@ -95,7 +114,7 @@ export default async function HomePage() {
                   {disciplinesData.map((d) => (
                     <span
                       key={d.id}
-                      className="border border-[#262626] px-3 py-1.5 font-label-mono text-label-mono uppercase text-paper-dim tracking-widest bg-surface-container-low"
+                      className="border border-[#262626] px-3 py-1.5 font-label-mono text-label-mono uppercase text-paper-dim tracking-widest bg-surface-container-low max-w-full text-ellipsis overflow-hidden"
                     >
                       {d.title}
                     </span>
@@ -138,7 +157,7 @@ export default async function HomePage() {
               </p>
               <div className="pt-4">
                 <Button variant="accent" href="/contact">
-                  INQUIRE FOR PRIVATE REPERTOIRE →
+                  INQUIRE FOR PRIVATE REPERTOIRE
                 </Button>
               </div>
             </div>
@@ -328,7 +347,7 @@ export default async function HomePage() {
                 href="/contact"
                 className="w-full sm:w-auto text-sm px-8 py-4 font-bold"
               >
-                START A PROJECT →
+                START A PROJECT
               </Button>
             </div>
           </div>

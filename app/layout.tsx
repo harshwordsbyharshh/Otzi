@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/navigation/Header";
@@ -19,7 +19,7 @@ const hankenGrotesk = Hanken_Grotesk({
 
 const siteUrl = getSiteUrl();
 
-/* 
+/*
  * JSON-LD Structured Data
  * Added for SEO and AI/search engine visibility.
  */
@@ -112,7 +112,7 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${hankenGrotesk.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-black text-white selection:bg-primary selection:text-white font-body-md text-body-md">
+      <body className="min-h-full flex flex-col bg-black text-white selection:bg-primary selection:text-white font-body-md text-body-md overflow-x-hidden max-w-full">
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
@@ -123,7 +123,7 @@ export default function RootLayout({
 
         <Header />
 
-        <main className="w-full pt-[72px] flex-1 flex flex-col">
+        <main className="w-full max-w-full overflow-x-hidden pt-[72px] flex-1 flex flex-col">
           {children}
         </main>
 

@@ -42,6 +42,7 @@
     color: #ffffff;
     font-family: var(--font-hanken-grotesk), sans-serif;
     color-scheme: dark;
+    overflow-x: hidden;
   }
 
   body {
@@ -52,6 +53,7 @@
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   ::selection {
@@ -80,10 +82,16 @@
 @layer utilities {
   .font-display-xl {
     font-family: var(--font-space-grotesk), sans-serif;
-    font-size: 44px;
-    line-height: 44px;
+    font-size: 38px;
+    line-height: 40px;
     letter-spacing: -0.03em;
     font-weight: 700;
+  }
+  @media (min-width: 420px) {
+    .font-display-xl {
+      font-size: 44px;
+      line-height: 44px;
+    }
   }
   @media (min-width: 768px) {
     .font-display-xl {
@@ -169,6 +177,62 @@
     line-height: 14px;
     letter-spacing: 0.12em;
     font-weight: 700;
+  }
+}
+
+/* Cinematic Hero Background Animations & Overlays */
+@keyframes heroBgReveal {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes heroContentFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-bg {
+  animation: heroBgReveal 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-hero-content {
+  animation: heroContentFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
+  will-change: transform, opacity;
+}
+
+.hero-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    /* 1. Bottom grounding: solid #000000 at bottom edge for seamless transition into next section */
+    linear-gradient(to top, #000000 0%, #000000 24px, rgba(8, 9, 11, 0.94) 80px, rgba(8, 9, 11, 0.82) 200px, rgba(8, 9, 11, 0.6) 360px, transparent 540px),
+    /* 2. Top hairline header integration */
+    linear-gradient(to bottom, rgba(8, 9, 11, 0.75) 0%, transparent 100px),
+    /* 3. Left-to-right subtle editorial veil behind headline & body */
+    linear-gradient(to right, rgba(8, 9, 11, 0.78) 0%, rgba(8, 9, 11, 0.5) 40%, rgba(8, 9, 11, 0.12) 75%, transparent 100%);
+}
+
+@media (max-width: 767px) {
+  .hero-gradient-overlay {
+    background:
+      /* 1. Bottom grounding: solid #000000 at bottom edge matching next section */
+      linear-gradient(to top, #000000 0%, #000000 24px, rgba(8, 9, 11, 0.95) 90px, rgba(8, 9, 11, 0.85) 240px, rgba(8, 9, 11, 0.62) 420px, transparent 580px),
+      /* 2. Top hairline header integration */
+      linear-gradient(to bottom, rgba(8, 9, 11, 0.8) 0%, rgba(8, 9, 11, 0.4) 140px, transparent 240px);
   }
 }
 
