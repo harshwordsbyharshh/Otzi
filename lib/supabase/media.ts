@@ -28,7 +28,7 @@ export {
  * Safe fallback if object does not exist or creation fails.
  */
 export async function createMediaSignedUrl(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient | null | undefined,
   storagePath: string,
   expiresInSeconds = 3600,
   storageProvider: "supabase" | "cloudinary" = "supabase",
@@ -49,8 +49,10 @@ export async function createMediaSignedUrl(
   if (storageProvider === "cloudinary") {
     try {
       const { resolveCloudinaryDeliveryUrl } = await import("@/lib/media/cloudinary");
+      const effectiveMediaType: "image" | "video" =
+        /\.(mp4|webm|mov|m4v|mkv|avi)(\?.*)?$/i.test(storagePath) ? "video" : mediaType;
       return resolveCloudinaryDeliveryUrl(storagePath, {
-        resourceType: mediaType,
+        resourceType: effectiveMediaType,
         expiresInSeconds,
         isPoster: options?.isPoster,
         format: options?.format,
@@ -62,6 +64,7 @@ export async function createMediaSignedUrl(
   }
 
   // Supabase Storage asset delivery
+  if (!supabase) return null;
   try {
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)

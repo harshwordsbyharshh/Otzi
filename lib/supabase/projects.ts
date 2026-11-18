@@ -2,6 +2,12 @@ import { createServiceRoleClient, createPublicClient } from "./server";
 import { SelectedProject, AssetType, AspectRatio, PlatformType, ProjectMediaItem } from "@/types/homepage";
 import { ProjectRecord, MediaRecord } from "@/types/project";
 import { createMediaSignedUrl } from "./media";
+import {
+  inferCoverMediaType,
+  resolveProjectCover,
+} from "@/lib/media/coverResolution";
+
+export { inferCoverMediaType, resolveProjectCover };
 
 function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
   const isDirectUrl =
@@ -119,20 +125,15 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
       distinctProjects.map(async (p) => {
         const item = mapDbProjectToSelectedProject(p);
         if (p.cover_path) {
-          const signedUrl = await createMediaSignedUrl(
+          const coverUrls = await resolveProjectCover(
             storageClient,
             p.cover_path,
-            3600,
             p.cover_storage_provider || "supabase",
-            "image"
+            p.asset_type
           );
-          if (signedUrl) {
-            item.thumbnailUrl = signedUrl;
-            item.mediaUrl = signedUrl;
-          } else {
-            const publicUrl = storageClient.storage.from("otzi-media").getPublicUrl(p.cover_path).data?.publicUrl;
-            item.thumbnailUrl = publicUrl || p.cover_path;
-            item.mediaUrl = publicUrl || p.cover_path;
+          if (coverUrls.mediaUrl) {
+            item.mediaUrl = coverUrls.mediaUrl;
+            item.thumbnailUrl = coverUrls.thumbnailUrl;
           }
         }
 
@@ -229,20 +230,15 @@ export async function getPublishedProjectBySlug(
 
     // Resolve cover signed URL if present
     if (p.cover_path) {
-      const coverSigned = await createMediaSignedUrl(
+      const coverUrls = await resolveProjectCover(
         storageClient,
         p.cover_path,
-        3600,
         p.cover_storage_provider || "supabase",
-        "image"
+        p.asset_type
       );
-      if (coverSigned) {
-        mapped.thumbnailUrl = coverSigned;
-        mapped.mediaUrl = coverSigned;
-      } else {
-        const publicUrl = storageClient.storage.from("otzi-media").getPublicUrl(p.cover_path).data?.publicUrl;
-        mapped.thumbnailUrl = publicUrl || p.cover_path;
-        mapped.mediaUrl = publicUrl || p.cover_path;
+      if (coverUrls.mediaUrl) {
+        mapped.mediaUrl = coverUrls.mediaUrl;
+        mapped.thumbnailUrl = coverUrls.thumbnailUrl;
       }
     }
 
