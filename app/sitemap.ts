@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/site";
 import { getPublishedProjects } from "@/lib/supabase/projects";
-import { getAllProjects } from "@/lib/data/homepage";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl();
@@ -20,12 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/case-studies`,
-      lastModified: currentDate,
-      changeFrequency: "weekly",
-      priority: 0.8,
     },
     {
       url: `${baseUrl}/services`,
@@ -61,19 +57,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     publishedProjectRoutes = [];
   }
 
-  // 3. Editorial Case Studies Dynamic Routes
-  let caseStudyRoutes: MetadataRoute.Sitemap = [];
-  try {
-    const caseStudies = getAllProjects();
-    caseStudyRoutes = caseStudies.map((cs) => ({
-      url: `${baseUrl}/case-studies/${cs.slug}`,
-      lastModified: currentDate,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    }));
-  } catch {
-    caseStudyRoutes = [];
-  }
-
-  return [...staticRoutes, ...publishedProjectRoutes, ...caseStudyRoutes];
+  return [...staticRoutes, ...publishedProjectRoutes];
 }

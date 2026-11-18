@@ -6,13 +6,13 @@ import { ArrowLink } from "@/components/ui/ArrowLink";
 
 interface ProjectCardProps {
   project: SelectedProject;
-  basePath?: "work" | "case-studies";
+  basePath?: "work";
   className?: string;
 }
 
 export function ProjectCard({
   project,
-  basePath = "case-studies",
+  basePath = "work",
   className = "",
 }: ProjectCardProps) {
   if (!project) return null;
@@ -97,7 +97,7 @@ export function ProjectCard({
         </div>
         <div className="pt-2 border-t border-[#262626] mt-2">
           <ArrowLink href={targetHref} color="primary">
-            {basePath === "work" ? "VIEW PROJECT" : "EXPLORE CASE STUDY"}
+            VIEW PROJECT
           </ArrowLink>
         </div>
       </div>

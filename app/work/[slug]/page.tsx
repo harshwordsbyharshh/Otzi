@@ -73,12 +73,18 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
 
   const allProjects = await getPublishedProjects();
   const currentIndex = allProjects.findIndex((p) => p.slug === slug);
+
+  // If the current slug is missing from the published project list, or if there are no other projects,
+  // safely omit previous/next links to prevent negative indexing, invalid jumps, or self-referential loops.
+  const hasMultipleProjects = allProjects.length > 1;
+  const isValidIndex = currentIndex !== -1;
+
   const nextProject =
-    allProjects.length > 0
+    hasMultipleProjects && isValidIndex
       ? allProjects[(currentIndex + 1) % allProjects.length]
       : null;
   const prevProject =
-    allProjects.length > 0
+    hasMultipleProjects && isValidIndex
       ? allProjects[(currentIndex - 1 + allProjects.length) % allProjects.length]
       : null;
 
