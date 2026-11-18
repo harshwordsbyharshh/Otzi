@@ -3,9 +3,6 @@ import { SelectedProject, AssetType, AspectRatio, PlatformType, ProjectMediaItem
 import { ProjectRecord, MediaRecord } from "@/types/project";
 import { createMediaSignedUrl } from "./media";
 
-import { isTemporaryTestProject } from "@/lib/projectFilters";
-export { isTemporaryTestProject };
-
 function mapDbProjectToSelectedProject(p: ProjectRecord): SelectedProject {
   const isDirectUrl =
     p.cover_path?.startsWith("http://") ||
@@ -95,10 +92,7 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
       return [];
     }
 
-    // Exclude any temporary or AI-generated test productions from public presentation
-    const validProjects = (data as ProjectRecord[]).filter(
-      (p) => !isTemporaryTestProject(p)
-    );
+    const validProjects = (data as ProjectRecord[]) || [];
 
     if (validProjects.length === 0) {
       return [];
@@ -125,7 +119,13 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
       distinctProjects.map(async (p) => {
         const item = mapDbProjectToSelectedProject(p);
         if (p.cover_path) {
-          const signedUrl = await createMediaSignedUrl(storageClient, p.cover_path, 3600);
+          const signedUrl = await createMediaSignedUrl(
+            storageClient,
+            p.cover_path,
+            3600,
+            p.cover_storage_provider || "supabase",
+            "image"
+          );
           if (signedUrl) {
             item.thumbnailUrl = signedUrl;
             item.mediaUrl = signedUrl;
@@ -140,7 +140,7 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
         if (!item.thumbnailUrl) {
           const { data: firstMedia } = await (serviceClient || supabase)
             .from("media")
-            .select("storage_path")
+            .select("storage_path, storage_provider, type")
             .eq("project_id", p.id)
             .order("sort_order", { ascending: true })
             .limit(1)
@@ -150,12 +150,27 @@ export async function getPublishedProjects(): Promise<SelectedProject[]> {
             const fallbackSignedUrl = await createMediaSignedUrl(
               storageClient,
               firstMedia.storage_path,
-              3600
+              3600,
+              firstMedia.storage_provider || "supabase",
+              firstMedia.type || "image"
             );
             const fallbackPublicUrl = storageClient.storage.from("otzi-media").getPublicUrl(firstMedia.storage_path).data?.publicUrl;
             const resolvedFallback = fallbackSignedUrl || fallbackPublicUrl || firstMedia.storage_path;
+
+            let posterSignedUrl: string | null = null;
+            if (firstMedia.type === "video" && firstMedia.storage_provider === "cloudinary") {
+              posterSignedUrl = await createMediaSignedUrl(
+                storageClient,
+                firstMedia.storage_path,
+                3600,
+                "cloudinary",
+                "video",
+                { isPoster: true }
+              );
+            }
+
             if (resolvedFallback) {
-              item.thumbnailUrl = resolvedFallback;
+              item.thumbnailUrl = posterSignedUrl || resolvedFallback;
               item.mediaUrl = resolvedFallback;
             }
           }
@@ -205,8 +220,8 @@ export async function getPublishedProjectBySlug(
 
     const p = data as ProjectRecord;
 
-    // Strict security constraint: unpublished drafts and test projects must remain hidden
-    if (!p.published || isTemporaryTestProject(p)) {
+    // Strict security constraint: unpublished drafts must remain hidden
+    if (!p.published) {
       return undefined;
     }
 
@@ -214,7 +229,13 @@ export async function getPublishedProjectBySlug(
 
     // Resolve cover signed URL if present
     if (p.cover_path) {
-      const coverSigned = await createMediaSignedUrl(storageClient, p.cover_path, 3600);
+      const coverSigned = await createMediaSignedUrl(
+        storageClient,
+        p.cover_path,
+        3600,
+        p.cover_storage_provider || "supabase",
+        "image"
+      );
       if (coverSigned) {
         mapped.thumbnailUrl = coverSigned;
         mapped.mediaUrl = coverSigned;
@@ -236,15 +257,39 @@ export async function getPublishedProjectBySlug(
       const typedMedia = mediaRows as MediaRecord[];
       const mediaSequence: ProjectMediaItem[] = await Promise.all(
         typedMedia.map(async (m) => {
-          const signed = await createMediaSignedUrl(storageClient, m.storage_path, 3600);
+          const signed = await createMediaSignedUrl(
+            storageClient,
+            m.storage_path,
+            3600,
+            m.storage_provider || "supabase",
+            m.type
+          );
           const publicUrl = storageClient.storage.from("otzi-media").getPublicUrl(m.storage_path).data?.publicUrl;
           const resolvedUrl = signed || publicUrl || m.storage_path;
+
+          let resolvedThumbnail = resolvedUrl;
+          // For Cloudinary videos, dynamically resolve a signed poster frame for the card thumbnail
+          if (m.type === "video" && m.storage_provider === "cloudinary") {
+            try {
+              const { resolveCloudinaryDeliveryUrl } = await import("@/lib/media/cloudinary");
+              const poster = resolveCloudinaryDeliveryUrl(m.storage_path, {
+                resourceType: "video",
+                isPoster: true,
+              });
+              if (poster) {
+                resolvedThumbnail = poster;
+              }
+            } catch {
+              // fallback to resolvedUrl
+            }
+          }
+
           return {
             id: m.id,
             caption: m.alt_text || p.title,
             aspectRatio: (p.aspect_ratio as AspectRatio) || "9:16",
             assetType: m.type === "video" ? ("REEL" as AssetType) : ("POST" as AssetType),
-            thumbnailUrl: resolvedUrl,
+            thumbnailUrl: resolvedThumbnail,
             mediaUrl: resolvedUrl,
           };
         })

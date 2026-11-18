@@ -10,7 +10,7 @@ import {
   deleteProjectMediaAction,
   setProjectCoverAction,
 } from "@/app/admin/(protected)/projects/mediaActions";
-import { validateMediaUpload, STORAGE_BUCKET, VIDEO_MAX_SIZE_BYTES } from "@/lib/supabase/media";
+import { validateMediaUpload, STORAGE_BUCKET } from "@/lib/supabase/mediaValidation";
 import { createClient } from "@/lib/supabase/client";
 
 interface ProjectMediaManagerProps {
@@ -38,6 +38,7 @@ export function ProjectMediaManager({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [altText, setAltText] = useState("");
   const [asCover, setAsCover] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   // Feedback states
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -125,7 +126,120 @@ export function ProjectMediaManager({
         fileSize: selectedFile.size,
       });
 
-      if (prepRes.success && prepRes.storagePath && prepRes.token) {
+      if (!prepRes.success) {
+        setErrorMessage(prepRes.error || "Failed to prepare storage upload.");
+        setUploading(false);
+        setUploadProgress(null);
+        return;
+      }
+
+      // Branch A: Direct Cloudinary Upload (Authenticated, 100MB video / 10MB image)
+      if (
+        prepRes.storageProvider === "cloudinary" &&
+        prepRes.uploadUrl &&
+        prepRes.signature
+      ) {
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+        uploadData.append("api_key", prepRes.apiKey || "");
+        uploadData.append("timestamp", String(prepRes.timestamp || ""));
+        uploadData.append("signature", prepRes.signature);
+        uploadData.append("public_id", prepRes.publicId || "");
+        uploadData.append("type", "authenticated");
+        if (prepRes.eager) {
+          uploadData.append("eager", prepRes.eager);
+        }
+
+        const cldResult = await new Promise<{
+          public_id: string;
+          bytes: number;
+          resource_type: string;
+        }>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", prepRes.uploadUrl!);
+
+          xhr.upload.onprogress = (evt) => {
+            if (evt.lengthComputable) {
+              const pct = Math.round((evt.loaded / evt.total) * 100);
+              setUploadProgress(pct);
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const json = JSON.parse(xhr.responseText);
+                resolve(json);
+              } catch {
+                reject(new Error("Invalid response received from Cloudinary."));
+              }
+            } else {
+              try {
+                const errJson = JSON.parse(xhr.responseText);
+                reject(
+                  new Error(
+                    errJson.error?.message ||
+                      `Cloudinary upload failed (HTTP ${xhr.status}).`
+                  )
+                );
+              } catch {
+                reject(
+                  new Error(
+                    `Cloudinary upload failed with HTTP status ${xhr.status}.`
+                  )
+                );
+              }
+            }
+          };
+
+          xhr.onerror = () => {
+            reject(new Error("Network error during Cloudinary upload."));
+          };
+
+          xhr.send(uploadData);
+        });
+
+        // Step 2: Notify server to create the database record with Cloudinary metadata
+        const completeRes = await completeMediaUploadAction({
+          projectId,
+          storagePath: cldResult.public_id || prepRes.publicId!,
+          storageProvider: "cloudinary",
+          mediaType:
+            cldResult.resource_type === "video" ? "video" : "image",
+          fileSize: cldResult.bytes || selectedFile.size,
+          altText: altText.trim(),
+          isCover: asCover,
+        });
+
+        if (!completeRes.success || !completeRes.media) {
+          setErrorMessage(
+            completeRes.error || "Failed to save media metadata in database."
+          );
+          setUploading(false);
+          setUploadProgress(null);
+          return;
+        }
+
+        const newMedia = completeRes.media;
+        setMediaList((prev) => [...prev, newMedia]);
+        setStatusMessage(
+          `Media asset "${selectedFile.name}" uploaded successfully to Cloudinary.`
+        );
+
+        if (asCover || !currentCoverPath) {
+          onCoverChange?.(newMedia.storage_path);
+        }
+
+        setSelectedFile(null);
+        setAltText("");
+        setAsCover(false);
+        setUploadProgress(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
+      // Branch B: Direct Supabase Storage Upload (Legacy / Fallback)
+      if (prepRes.storagePath && prepRes.token) {
         // Direct browser upload to Supabase Storage - completely bypasses Vercel 4.5MB payload limit!
         const supabase = createClient();
         const uploadResult = await supabase.storage
@@ -159,8 +273,10 @@ export function ProjectMediaManager({
         const completeRes = await completeMediaUploadAction({
           projectId,
           storagePath: prepRes.storagePath,
+          storageProvider: "supabase",
           mediaType:
             prepRes.mediaType || (selectedFile.type.startsWith("video") ? "video" : "image"),
+          fileSize: selectedFile.size,
           altText: altText.trim(),
           isCover: asCover,
         });
@@ -168,6 +284,7 @@ export function ProjectMediaManager({
         if (!completeRes.success || !completeRes.media) {
           setErrorMessage(completeRes.error || "Failed to save media metadata in database.");
           setUploading(false);
+          setUploadProgress(null);
           return;
         }
 
@@ -183,6 +300,7 @@ export function ProjectMediaManager({
         setSelectedFile(null);
         setAltText("");
         setAsCover(false);
+        setUploadProgress(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
@@ -200,6 +318,7 @@ export function ProjectMediaManager({
         if (!res.success || !res.media) {
           setErrorMessage(res.error || prepRes.error || "Failed to upload media to storage.");
           setUploading(false);
+          setUploadProgress(null);
           return;
         }
 
@@ -215,10 +334,11 @@ export function ProjectMediaManager({
         setSelectedFile(null);
         setAltText("");
         setAsCover(false);
+        setUploadProgress(null);
         if (fileInputRef.current) fileInputRef.current.value = "";
       } else {
         setErrorMessage(
-          prepRes.error || "Direct storage upload could not be prepared for this video."
+          prepRes.error || "Direct storage upload could not be prepared for this file."
         );
       }
     } catch (err: unknown) {
@@ -230,11 +350,12 @@ export function ProjectMediaManager({
         msg.toLowerCase().includes("exceeded the maximum") ||
         msg.toLowerCase().includes("size limit");
       const friendlyMsg = isSizeError
-        ? `Storage upload rejected: File exceeds Supabase single-file limit (50MB on Free Tier). Please provide a 1080p web cutdown under 50MB.`
+        ? `Upload rejected: File exceeds storage limits (100MB for video, 10MB for image).`
         : msg;
       setErrorMessage(friendlyMsg);
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -378,7 +499,7 @@ export function ProjectMediaManager({
             </span>
           </div>
           <span className="font-label-mono text-[10px] text-paper-dim uppercase">
-            MAX: 15MB (IMAGE) / {Math.round(VIDEO_MAX_SIZE_BYTES / (1024 * 1024))}MB (VIDEO)
+            MAX: 10MB (IMAGE) / 100MB (VIDEO)
           </span>
         </div>
 
@@ -442,10 +563,30 @@ export function ProjectMediaManager({
               disabled={uploading || !selectedFile}
               className="bg-primary hover:bg-white text-white hover:text-black disabled:opacity-40 disabled:cursor-not-allowed font-label-action text-xs uppercase tracking-widest px-5 py-2.5 font-bold transition-colors cursor-pointer select-none whitespace-nowrap text-center"
             >
-              {uploading ? "UPLOADING..." : "UPLOAD ASSET ↑"}
+              {uploading
+                ? uploadProgress !== null
+                  ? `UPLOADING ${uploadProgress}%`
+                  : "UPLOADING..."
+                : "UPLOAD ASSET ↑"}
             </button>
           </div>
         </div>
+
+        {/* Upload Progress Bar */}
+        {uploading && uploadProgress !== null && (
+          <div className="flex flex-col gap-1.5 border-t border-[#262626] pt-3">
+            <div className="flex justify-between text-[10px] font-label-mono text-paper-dim uppercase tracking-wider">
+              <span>DIRECT STORAGE UPLOAD IN PROGRESS</span>
+              <span className="text-white font-bold">{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-[#1a1a1a] border border-[#262626] h-2 relative overflow-hidden">
+              <div
+                className="bg-primary h-full transition-all duration-150 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {selectedFile && (
           <div className="flex items-center justify-between text-[11px] font-label-mono text-paper-dim border-t border-[#262626] pt-2">
@@ -539,6 +680,13 @@ export function ProjectMediaManager({
                     <div className="flex items-center justify-between text-paper-dim uppercase">
                       <span>TYPE: <strong className="text-white">{item.type.toUpperCase()}</strong></span>
                       <span>ORDER: <strong className="text-white">#{item.sort_order}</strong></span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-paper-dim uppercase">
+                      <span>PROVIDER: <strong className="text-white">{item.storage_provider ? item.storage_provider.toUpperCase() : "SUPABASE"}</strong></span>
+                      {item.file_size ? (
+                        <span>{(item.file_size / (1024 * 1024)).toFixed(1)} MB</span>
+                      ) : null}
                     </div>
 
                     <div className="text-white truncate" title={item.alt_text || item.storage_path}>

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { ProjectInput, ProjectRecord } from "@/types/project";
+import { purgeProjectMediaStorage } from "@/lib/media/deletion";
 
 export async function verifyAdminAuth() {
   const supabase = await createClient();
@@ -73,6 +74,7 @@ export async function createProjectAction(
         aspect_ratio,
         description,
         cover_path,
+        cover_storage_provider: input.cover_storage_provider || "supabase",
         published,
         created_by: user.id,
       })
@@ -162,6 +164,10 @@ export async function updateProjectAction(
       published,
       updated_at: new Date().toISOString(),
     };
+
+    if (input.cover_storage_provider !== undefined) {
+      updatePayload.cover_storage_provider = input.cover_storage_provider;
+    }
 
     if (shouldUnpin) {
       updatePayload.is_featured = false;
@@ -291,32 +297,52 @@ export async function deleteProjectAction(
       projectSlug = fallbackRecord?.slug;
     }
 
-    // 1. Fetch any attached media records to purge storage files
+    // 1. Fetch any attached media records to purge storage files across providers
     const { data: mediaItems } = await supabase
       .from("media")
-      .select("storage_path")
+      .select("storage_path, storage_provider, type")
       .eq("project_id", id);
 
     if (mediaItems && mediaItems.length > 0) {
-      const storagePaths = mediaItems
-        .map((m) => m.storage_path)
-        .filter(Boolean);
+      // Purge storage files across providers with fail-fast safety
+      const purgeResult = await purgeProjectMediaStorage(id, mediaItems, {
+        removeSupabasePaths: (paths) => supabase.storage.from("otzi-media").remove(paths),
+        deleteCloudinaryAsset: async (path, type) => {
+          const { deleteCloudinaryAsset } = await import("@/lib/media/cloudinary");
+          return deleteCloudinaryAsset(path, type);
+        },
+      });
 
-      if (storagePaths.length > 0) {
-        await supabase.storage.from("otzi-media").remove(storagePaths);
+      if (!purgeResult.success) {
+        return { success: false, error: purgeResult.error };
       }
 
-      await supabase.from("media").delete().eq("project_id", id);
+      const { error: mediaDeleteError } = await supabase
+        .from("media")
+        .delete()
+        .eq("project_id", id);
+
+      if (mediaDeleteError) {
+        console.error("[deleteProjectAction] Failed to delete media rows:", mediaDeleteError);
+        return {
+          success: false,
+          error: `Project deletion partially failed: Remote media assets were purged, but database media records could not be deleted (${mediaDeleteError.message}). Project record was preserved.`,
+        };
+      }
     }
 
     // 2. Delete project record
-    const { error } = await supabase
+    const { error: projectDeleteError } = await supabase
       .from("projects")
       .delete()
       .eq("id", id);
 
-    if (error) {
-      return { success: false, error: error.message };
+    if (projectDeleteError) {
+      console.error("[deleteProjectAction] Failed to delete project row:", projectDeleteError);
+      return {
+        success: false,
+        error: `Project deletion partially failed: Media assets and media database records were purged, but the project record could not be deleted (${projectDeleteError.message}).`,
+      };
     }
 
     if (wasFeatured) {
@@ -326,8 +352,8 @@ export async function deleteProjectAction(
     revalidatePath("/admin/projects");
     revalidatePath("/admin/dashboard");
     revalidatePath("/work");
-    if (projectRecord?.slug) {
-      revalidatePath(`/work/${projectRecord.slug}`);
+    if (projectSlug) {
+      revalidatePath(`/work/${projectSlug}`);
     }
     revalidatePath("/");
 
@@ -694,56 +720,6 @@ export async function reorderFeaturedReelsAction(
     revalidatePath("/");
 
     return { success: true };
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unexpected server error.";
-    return { success: false, error: message };
-  }
-}
-
-export async function purgeAiTestProjectsAction(): Promise<{
-  success: boolean;
-  count?: number;
-  error?: string;
-}> {
-  try {
-    const { supabase } = await verifyAdminAuth();
-
-    const { data: allProjects, error } = await supabase
-      .from("projects")
-      .select("id, title, slug, description");
-
-    if (error || !allProjects) {
-      return { success: false, error: error?.message || "Failed to load projects." };
-    }
-
-    const testProjects = (allProjects as ProjectRecord[]).filter((p) => {
-      const text = `${p.title || ""} ${p.slug || ""} ${p.description || ""}`.toLowerCase();
-      return (
-        text.includes("ai generated") ||
-        text.includes("ai-generated") ||
-        text.includes("ai reel") ||
-        text.includes("ai post") ||
-        text.includes("temporary reel") ||
-        text.includes("temporary post") ||
-        text.includes("temp reel") ||
-        text.includes("temp post") ||
-        text.includes("test reel") ||
-        text.includes("test post") ||
-        text.includes("test content") ||
-        text.includes("temp content")
-      );
-    });
-
-    for (const p of testProjects) {
-      await deleteProjectAction(p.id);
-    }
-
-    revalidatePath("/admin/projects");
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/work");
-    revalidatePath("/");
-
-    return { success: true, count: testProjects.length };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unexpected server error.";
     return { success: false, error: message };

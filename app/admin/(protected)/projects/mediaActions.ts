@@ -9,6 +9,12 @@ import {
   generateSafeStoragePath,
   createMediaSignedUrl,
 } from "@/lib/supabase/media";
+import {
+  isCloudinaryConfigured,
+  generateUploadSignature,
+  verifyCloudinaryAsset,
+  deleteCloudinaryAsset,
+} from "@/lib/media/cloudinary";
 
 export async function getProjectMediaAction(
   projectId: string
@@ -28,10 +34,16 @@ export async function getProjectMediaAction(
 
     const mediaList = (data as MediaRecord[]) || [];
 
-    // Attach signed URLs for private bucket preview in admin console
+    // Attach signed URLs for private asset preview in admin console
     const mediaWithSignedUrls: MediaRecord[] = await Promise.all(
       mediaList.map(async (item) => {
-        const signedUrl = await createMediaSignedUrl(supabase, item.storage_path, 3600);
+        const signedUrl = await createMediaSignedUrl(
+          supabase,
+          item.storage_path,
+          3600,
+          item.storage_provider || "supabase",
+          item.type
+        );
         return {
           ...item,
           signedUrl,
@@ -47,8 +59,9 @@ export async function getProjectMediaAction(
 }
 
 /**
- * Authorizes and prepares direct-to-storage signed upload URL for browser uploads.
- * This completely bypasses Vercel/Serverless payload limits (4.5MB) for videos up to 300MB.
+ * Authorizes and prepares direct-to-storage signed upload parameters for browser uploads.
+ * Prioritizes Cloudinary direct upload (supporting up to 100MB videos and 10MB images),
+ * with safe fallback to Supabase Storage when Cloudinary is unconfigured.
  */
 export async function prepareMediaUploadAction(input: {
   projectId: string;
@@ -57,7 +70,15 @@ export async function prepareMediaUploadAction(input: {
   fileSize: number;
 }): Promise<{
   success: boolean;
+  storageProvider?: "supabase" | "cloudinary";
   storagePath?: string;
+  publicId?: string;
+  uploadUrl?: string;
+  signature?: string;
+  timestamp?: number;
+  apiKey?: string;
+  cloudName?: string;
+  eager?: string;
   token?: string;
   signedUrl?: string;
   mediaType?: "image" | "video";
@@ -94,10 +115,37 @@ export async function prepareMediaUploadAction(input: {
       return { success: false, error: "Target project does not exist in the archive." };
     }
 
-    // 3. Generate collision-safe storage path
-    const storagePath = generateSafeStoragePath(projectId, fileName);
+    // 3. If Cloudinary is configured, prepare direct Cloudinary signed upload
+    if (isCloudinaryConfigured()) {
+      const sigResult = generateUploadSignature({
+        projectId,
+        fileName,
+        fileType,
+        fileSize,
+      });
 
-    // 4. Create signed upload URL in Supabase Storage
+      if (!sigResult.success) {
+        return { success: false, error: sigResult.error };
+      }
+
+      return {
+        success: true,
+        storageProvider: "cloudinary",
+        storagePath: sigResult.publicId,
+        publicId: sigResult.publicId,
+        uploadUrl: sigResult.uploadUrl,
+        signature: sigResult.signature,
+        timestamp: sigResult.timestamp,
+        apiKey: sigResult.apiKey,
+        cloudName: sigResult.cloudName,
+        eager: sigResult.eager,
+        mediaType: sigResult.resourceType,
+        resolvedMime: validation.resolvedMime,
+      };
+    }
+
+    // 4. Fallback: Supabase Storage signed upload URL
+    const storagePath = generateSafeStoragePath(projectId, fileName);
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
       .createSignedUploadUrl(storagePath);
@@ -111,6 +159,7 @@ export async function prepareMediaUploadAction(input: {
 
     return {
       success: true,
+      storageProvider: "supabase",
       storagePath,
       token: uploadData.token,
       signedUrl: uploadData.signedUrl,
@@ -129,16 +178,35 @@ export async function prepareMediaUploadAction(input: {
 export async function completeMediaUploadAction(input: {
   projectId: string;
   storagePath: string;
+  storageProvider?: "supabase" | "cloudinary";
   mediaType: "image" | "video";
+  fileSize?: number;
   altText?: string;
   isCover?: boolean;
 }): Promise<{ success: boolean; media?: MediaRecord; error?: string }> {
   try {
     const { supabase } = await verifyAdminAuth();
-    const { projectId, storagePath, mediaType, altText = "", isCover = false } = input;
+    const {
+      projectId,
+      storagePath,
+      storageProvider = "supabase",
+      mediaType,
+      fileSize,
+      altText = "",
+      isCover = false,
+    } = input;
 
     if (!projectId || !storagePath) {
       return { success: false, error: "Missing required upload metadata." };
+    }
+
+    // Security Gate: Strict prefix containment to prevent cross-project spoofing and path traversal
+    const expectedPrefix = `projects/${projectId}/`;
+    if (!storagePath.startsWith(expectedPrefix)) {
+      return {
+        success: false,
+        error: `Security violation: storagePath "${storagePath}" does not belong to project "${projectId}".`,
+      };
     }
 
     // 1. Verify project exists
@@ -152,7 +220,51 @@ export async function completeMediaUploadAction(input: {
       return { success: false, error: "Target project does not exist in the archive." };
     }
 
-    // 2. Calculate next sort order
+    // 2. Idempotency Check: Return existing record if already created
+    const { data: existingMedia } = await supabase
+      .from("media")
+      .select("*")
+      .eq("project_id", projectId)
+      .eq("storage_path", storagePath)
+      .maybeSingle();
+
+    if (existingMedia) {
+      const signedUrl = await createMediaSignedUrl(
+        supabase,
+        existingMedia.storage_path,
+        3600,
+        existingMedia.storage_provider || "supabase",
+        existingMedia.type
+      );
+      return {
+        success: true,
+        media: {
+          ...(existingMedia as MediaRecord),
+          signedUrl,
+        },
+      };
+    }
+
+    // 3. Server-side verification for Cloudinary uploads
+    let verifiedBytes = fileSize || null;
+    if (storageProvider === "cloudinary") {
+      const verifyResult = await verifyCloudinaryAsset(
+        storagePath,
+        mediaType,
+        projectId
+      );
+      if (!verifyResult.valid) {
+        return {
+          success: false,
+          error: verifyResult.error || "Cloudinary asset verification failed.",
+        };
+      }
+      if (verifyResult.bytes) {
+        verifiedBytes = verifyResult.bytes;
+      }
+    }
+
+    // 4. Calculate next sort order
     const { count } = await supabase
       .from("media")
       .select("*", { count: "exact", head: true })
@@ -160,13 +272,15 @@ export async function completeMediaUploadAction(input: {
 
     const sortOrder = (count ?? 0) + 1;
 
-    // 3. Insert metadata into public.media
+    // 5. Insert metadata into public.media
     const { data: mediaRow, error: insertError } = await supabase
       .from("media")
       .insert({
         project_id: projectId,
         type: mediaType,
         storage_path: storagePath,
+        storage_provider: storageProvider,
+        file_size: verifiedBytes,
         alt_text: altText.trim() || null,
         sort_order: sortOrder,
       })
@@ -174,27 +288,70 @@ export async function completeMediaUploadAction(input: {
       .single();
 
     if (insertError || !mediaRow) {
-      // Revert storage upload to prevent orphaned storage objects
-      await supabase.storage.from(STORAGE_BUCKET).remove([storagePath]);
+      // Concurrency handling: If duplicate key violation (code 23505), fetch and return the concurrent row
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((insertError as any)?.code === "23505") {
+        const { data: concurrentMedia } = await supabase
+          .from("media")
+          .select("*")
+          .eq("project_id", projectId)
+          .eq("storage_path", storagePath)
+          .maybeSingle();
+
+        if (concurrentMedia) {
+          const signedUrl = await createMediaSignedUrl(
+            supabase,
+            concurrentMedia.storage_path,
+            3600,
+            concurrentMedia.storage_provider || "supabase",
+            concurrentMedia.type
+          );
+          return {
+            success: true,
+            media: {
+              ...(concurrentMedia as MediaRecord),
+              signedUrl,
+            },
+          };
+        }
+      }
+
+      // Revert upload to prevent orphaned storage objects ONLY if within the project namespace
+      if (storageProvider === "cloudinary") {
+        if (storagePath.startsWith(expectedPrefix)) {
+          await deleteCloudinaryAsset(storagePath, mediaType);
+        }
+      } else {
+        if (storagePath.startsWith(expectedPrefix)) {
+          await supabase.storage.from(STORAGE_BUCKET).remove([storagePath]);
+        }
+      }
       return {
         success: false,
         error: `Database metadata write failed: ${insertError?.message || "Unknown error"}`,
       };
     }
 
-    // 4. Handle project cover update
+    // 5. Handle project cover update
     if (isCover || !project.cover_path) {
       await supabase
         .from("projects")
         .update({
           cover_path: storagePath,
+          cover_storage_provider: storageProvider,
           updated_at: new Date().toISOString(),
         })
         .eq("id", projectId);
     }
 
-    // 5. Generate signed URL for immediate client preview
-    const signedUrl = await createMediaSignedUrl(supabase, storagePath, 3600);
+    // 6. Generate signed URL for immediate client preview
+    const signedUrl = await createMediaSignedUrl(
+      supabase,
+      storagePath,
+      3600,
+      storageProvider,
+      mediaType
+    );
     const mediaWithSignedUrl: MediaRecord = {
       ...(mediaRow as MediaRecord),
       signedUrl,
@@ -380,16 +537,26 @@ export async function deleteProjectMediaAction(
 
     const isCurrentCover = project?.cover_path === typedMedia.storage_path;
 
-    // 3. Remove file from Supabase Storage
-    const { error: storageError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .remove([typedMedia.storage_path]);
+    // 3. Remove file from storage provider
+    if (typedMedia.storage_provider === "cloudinary") {
+      const delRes = await deleteCloudinaryAsset(typedMedia.storage_path, typedMedia.type);
+      if (!delRes.success) {
+        return {
+          success: false,
+          error: `Failed to remove file from Cloudinary: ${delRes.error || "Unknown error"}`,
+        };
+      }
+    } else {
+      const { error: storageError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .remove([typedMedia.storage_path]);
 
-    if (storageError) {
-      return {
-        success: false,
-        error: `Failed to remove file from storage: ${storageError.message}`,
-      };
+      if (storageError) {
+        return {
+          success: false,
+          error: `Failed to remove file from storage: ${storageError.message}`,
+        };
+      }
     }
 
     // 4. Remove row from public.media
@@ -405,24 +572,25 @@ export async function deleteProjectMediaAction(
       };
     }
 
-    // 5. If this media was the project cover, update cover_path
+    // 5. If this media was the project cover, update cover_path and cover_storage_provider
     if (isCurrentCover) {
       // Find next available media item for this project
       const { data: remainingMedia } = await supabase
         .from("media")
-        .select("storage_path")
+        .select("storage_path, storage_provider")
         .eq("project_id", projectId)
         .order("sort_order", { ascending: true })
         .limit(1);
 
-      const nextCoverPath = remainingMedia && remainingMedia.length > 0
-        ? remainingMedia[0].storage_path
-        : null;
+      const nextItem = remainingMedia && remainingMedia.length > 0 ? remainingMedia[0] : null;
+      const nextCoverPath = nextItem ? nextItem.storage_path : null;
+      const nextCoverProvider = nextItem ? nextItem.storage_provider || "supabase" : "supabase";
 
       await supabase
         .from("projects")
         .update({
           cover_path: nextCoverPath,
+          cover_storage_provider: nextCoverProvider,
           updated_at: new Date().toISOString(),
         })
         .eq("id", projectId);
@@ -453,7 +621,7 @@ export async function setProjectCoverAction(
     // Verify storage path belongs to this project
     const { data: media } = await supabase
       .from("media")
-      .select("id")
+      .select("id, storage_provider")
       .eq("project_id", projectId)
       .eq("storage_path", storagePath)
       .maybeSingle();
@@ -466,6 +634,7 @@ export async function setProjectCoverAction(
       .from("projects")
       .update({
         cover_path: storagePath,
+        cover_storage_provider: media.storage_provider || "supabase",
         updated_at: new Date().toISOString(),
       })
       .eq("id", projectId)

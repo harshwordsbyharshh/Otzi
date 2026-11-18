@@ -44,6 +44,7 @@ export function FeaturedReelsManager({
   // Sync with incoming projects when they change externally
   useEffect(() => {
     const list = getFeaturedList(projects);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFeaturedList(list);
     setSavedOrderIds(list.map((p) => p.id));
   }, [projects]);

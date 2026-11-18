@@ -12,6 +12,7 @@ export interface ProjectRecord {
   aspect_ratio: AspectRatio | string;
   description: string | null;
   cover_path: string | null;
+  cover_storage_provider?: "supabase" | "cloudinary" | null;
   published: boolean;
   is_featured?: boolean;
   featured_order?: number | null;
@@ -31,6 +32,7 @@ export type ProjectInput = {
   aspect_ratio: AspectRatio | string;
   description?: string | null;
   cover_path?: string | null;
+  cover_storage_provider?: "supabase" | "cloudinary" | null;
   published: boolean;
   is_featured?: boolean;
   featured_order?: number | null;
@@ -45,6 +47,8 @@ export interface MediaRecord {
   project_id: string;
   type: MediaType;
   storage_path: string;
+  storage_provider?: "supabase" | "cloudinary";
+  file_size?: number | null;
   alt_text: string | null;
   sort_order: number;
   created_at?: string;
