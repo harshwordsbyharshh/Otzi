@@ -34,7 +34,7 @@ export function Footer() {
             </div>
             <div className="flex flex-col gap-2 font-label-action text-label-action uppercase">
               <a
-                href="https://www.instagram.com/otzi_x_si"
+                href="https://www.instagram.com/otzi.marketing/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-paper-dim hover:text-primary transition-colors inline-flex items-center gap-1.5"

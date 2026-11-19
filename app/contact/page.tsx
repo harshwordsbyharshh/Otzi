@@ -127,7 +127,7 @@ export default function ContactPage() {
                 </span>
                 <div className="space-y-3 font-label-action text-label-action uppercase text-sm">
                   <a
-                    href="https://www.instagram.com/otzi_x_si"
+                    href="https://www.instagram.com/otzi.marketing/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between text-white hover:text-primary transition-colors border-b border-[#262626] pb-2 min-h-[44px]"
